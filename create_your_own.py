@@ -9,7 +9,7 @@ from app.config import BASE_DIR, load_config, save_config
 from app.sprite_processor import key_out_magenta
 
 VOICE_PRESETS = {
-    "1": ("en-IN-NeerjaNeural", "Indian English (Female — Neerja)"),
+    "1": ("en-IN-NeerjaExpressiveNeural", "Indian English Expressive (Female — Neerja)"),
     "2": ("hi-IN-SwaraNeural", "Hindi (Female — Swara)"),
     "3": ("en-US-JennyNeural", "US English (Female — Jenny)"),
     "4": ("en-GB-SoniaNeural", "British English (Female — Sonia)"),

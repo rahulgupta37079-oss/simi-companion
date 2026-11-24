@@ -18,11 +18,12 @@ DB_PATH = DATA_DIR / "simi.db"
 @dataclass
 class SimiConfig:
     assistant_name: str = "Simi"
-    user_name: str = "Partner"
-    voice_name: str = "en-IN-NeerjaNeural"
-    voice_rate: str = "+2%"
-    voice_pitch: str = "+2Hz"
+    user_name: str = ""
+    voice_name: str = "en-IN-NeerjaExpressiveNeural"
+    voice_rate: str = "+0%"
+    voice_pitch: str = "+1Hz"
     voice_enabled: bool = True
+    interview_prep_mode: bool = False
 
     # AI provider: "auto", "gemini", "groq", "openai_compat", "ollama", "builtin"
     ai_provider: str = "auto"

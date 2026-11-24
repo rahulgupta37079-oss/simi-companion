@@ -45,16 +45,24 @@ def main() -> None:
         def on_roam(_icon, _item):
             companion.root.after(0, companion._toggle_roam)
 
+        def on_meeting(_icon, _item):
+            companion.root.after(0, companion.toggle_meeting_pause)
+
+        def on_prep(_icon, _item):
+            companion.root.after(0, companion._toggle_interview_prep)
+
         def on_quit(icon, _item):
             icon.stop()
             companion.root.after(0, companion.quit)
 
         menu = pystray.Menu(
             pystray.MenuItem("Talk to Simi", on_talk, default=True),
+            pystray.MenuItem("Show / Hide (Meeting Pause)", on_meeting),
+            pystray.MenuItem("Toggle Interview & Study Prep", on_prep),
             pystray.MenuItem("I'm Feeling Low / Comfort", on_comfort),
             pystray.MenuItem("Morning Check-in", on_morning),
             pystray.MenuItem("Toggle Free Roaming", on_roam),
-            pystray.MenuItem("AI Brain & Profile Settings", on_settings),
+            pystray.MenuItem("AI Brain & Voice Settings", on_settings),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Quit Simi", on_quit),
         )

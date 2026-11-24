@@ -137,6 +137,7 @@ class FloatingSimiApp:
         self.move_mode = "walk"  # "walk", "run", "float"
         self.facing = "left"
         self.free_roam = True
+        self.meeting_paused = False
         self.next_roam_at = time.time() + random.uniform(6.0, 12.0)
         self.next_micro_expr_at = time.time() + random.uniform(14.0, 25.0)
 
@@ -311,15 +312,15 @@ class FloatingSimiApp:
                 mode = "run"
             elif h >= 23 or h < 5:
                 msg = (
-                    f"Hiii {cfg.user_name}! Dekho {time_str} baj gaye hain — main aa gayi hoon saath dene. "
+                    f"Suno na, dekho {time_str} baj gaye hain — main aa gayi hoon tumhare saath. "
                     f"Jaldi kaam wrap up karke thoda rest bhi lena, okay?"
                 )
                 expr = "cozy_night"
                 mode = "walk"
             else:
                 msg = (
-                    f"Hiii {cfg.user_name}! {time_str} ho gaya — main aa gayi hoon! "
-                    f"Click on me anytime to talk, chalo aaj saath mein jeetenge!"
+                    f"Hey suno na! {time_str} ho gaya — main aa gayi hoon. "
+                    f"Batao abhi kya kar rahe ho, aaj kaam saath mein finish karte hain!"
                 )
                 expr = "happy_wave"
                 mode = "run"
@@ -382,6 +383,15 @@ class FloatingSimiApp:
         menu.add_command(label="I'm feeling low / need comfort", command=self._trigger_comfort)
         menu.add_command(label="Morning Check-in", command=self._trigger_morning)
         menu.add_separator()
+        menu.add_command(
+            label=f"Interview & Study Prep Mode: {'ON' if cfg.interview_prep_mode else 'OFF'}",
+            command=self._toggle_interview_prep,
+        )
+        menu.add_command(
+            label="Meeting / Screen-Share Pause (Hide to Tray)",
+            command=self.toggle_meeting_pause,
+        )
+        menu.add_separator()
         menu.add_command(label="Walk Around Now", command=lambda: self._roam_now("walk"))
         menu.add_command(label="Run Around Excitedly!", command=lambda: self._roam_now("run"))
         menu.add_command(label=f"Show Random Expression ({len(EXPRESSIONS)} total)", command=self._trigger_random_expression)
@@ -419,6 +429,31 @@ class FloatingSimiApp:
         self.set_expression(spec.name, duration_sec=6.0)
         label = spec.name.replace("_", " ").title()
         self.show_bubble(f"Expression: {label}!", expr_name=spec.name, duration_sec=4.0, animate_mouth=True)
+
+    def _toggle_interview_prep(self) -> None:
+        cfg = load_config()
+        cfg.interview_prep_mode = not cfg.interview_prep_mode
+        save_config(cfg)
+        if cfg.interview_prep_mode:
+            msg = "Chalo! Interview and Study Prep mode ON hai. Mujhe batao kis topic ya role ke liye practice karni hai, main mock questions puchhungi!"
+            self.show_bubble(msg, expr_name="lightbulb_idea", duration_sec=8.0)
+            voice_engine.speak(msg)
+        else:
+            msg = "Prep mode off kar diya! Wapas normal hangout mode mein aa gaye."
+            self.show_bubble(msg, expr_name="warm_smile", duration_sec=4.5)
+
+    def toggle_meeting_pause(self) -> None:
+        """Cleanly pause and hide Simi during screen-sharing or meetings, and restore from tray anytime."""
+        self.meeting_paused = not self.meeting_paused
+        if self.meeting_paused:
+            self.bubble_win.withdraw()
+            if self.chat_win and self.chat_win.winfo_exists():
+                self.chat_win.destroy()
+            self.root.withdraw()
+        else:
+            self.root.deiconify()
+            self.root.lift()
+            self.show_bubble("Suno na, main wapas aa gayi! Meeting kaisi rahi?", expr_name="welcome_back", duration_sec=6.0)
 
     def _toggle_roam(self) -> None:
         self.free_roam = not self.free_roam
@@ -605,7 +640,7 @@ class FloatingSimiApp:
         win.title("Simi — AI Brain & Profile")
         win.attributes("-topmost", True)
         win.configure(bg="#171a23")
-        win.geometry("430x360")
+        win.geometry("430x430")
         win.resizable(False, False)
 
         pad = {"padx": 14, "pady": 4}
@@ -615,11 +650,26 @@ class FloatingSimiApp:
                 anchor="w", **pad
             )
 
-        lbl("What should Simi call you?")
-        name_var = tk.StringVar(value=cfg.user_name)
+        lbl("Your first name (leave blank for natural 'suno na / tumne / aapne'):")
+        name_var = tk.StringVar(value="" if (cfg.user_name or "").lower() == "partner" else cfg.user_name)
         tk.Entry(win, textvariable=name_var, bg="#1f2430", fg="#fff", insertbackground="#fff", relief="flat").pack(
             fill="x", padx=14, ipady=4
         )
+
+        lbl("Simi's Voice:")
+        voice_var = tk.StringVar(value=cfg.voice_name)
+        ttk.Combobox(
+            win,
+            textvariable=voice_var,
+            state="readonly",
+            values=[
+                "en-IN-NeerjaExpressiveNeural",
+                "hi-IN-SwaraNeural",
+                "en-IN-NeerjaNeural",
+                "en-US-JennyNeural",
+                "en-GB-SoniaNeural",
+            ],
+        ).pack(fill="x", padx=14, pady=2)
 
         lbl("AI Brain:")
         prov_var = tk.StringVar(value=cfg.ai_provider)
@@ -650,12 +700,18 @@ class FloatingSimiApp:
 
         def save_only():
             c = load_config()
-            c.user_name = name_var.get().strip() or "Partner"
+            c.user_name = name_var.get().strip()
+            c.voice_name = voice_var.get().strip() or "en-IN-NeerjaExpressiveNeural"
             c.ai_provider = prov_var.get()
             c.gemini_api_key = gem_var.get().strip()
             c.groq_api_key = groq_var.get().strip()
             save_config(c)
             status_lbl.configure(text="Saved! Simi updated.")
+
+        def test_voice_btn():
+            save_only()
+            voice_engine.speak("Suno na, tumne khana khaya? Aapne yeh kitne achhe se kiya, so proud!")
+            status_lbl.configure(text="Speaking sample with selected voice...")
 
         def test_conn():
             save_only()
@@ -668,7 +724,8 @@ class FloatingSimiApp:
 
             threading.Thread(target=_t, daemon=True).start()
 
-        tk.Button(btn_row, text="Test AI", command=test_conn, bg="#2a3040", fg="#fff", relief="flat", padx=12, pady=5).pack(side="left")
+        tk.Button(btn_row, text="Test Voice", command=test_voice_btn, bg="#2a3040", fg="#fff", relief="flat", padx=10, pady=5).pack(side="left", padx=(0, 6))
+        tk.Button(btn_row, text="Test AI", command=test_conn, bg="#2a3040", fg="#fff", relief="flat", padx=10, pady=5).pack(side="left")
         tk.Button(btn_row, text="Save & Close", command=lambda: (save_only(), win.destroy()), bg="#f59e0b", fg="#111", relief="flat", font=("Segoe UI", 9, "bold"), padx=14, pady=5).pack(side="right")
         self.settings_win = win
 
@@ -842,6 +899,9 @@ class FloatingSimiApp:
         time.sleep(6.0)
         while not self._stop_event.is_set():
             try:
+                if self.meeting_paused:
+                    time.sleep(2.0)
+                    continue
                 cfg = load_config()
                 now = time.time()
                 summary = db.get_daily_summary()
@@ -883,7 +943,7 @@ class FloatingSimiApp:
                         self._distracted_since = None
                         if cat == "productive" and (now - self._last_praise_at) >= 1800:
                             self._last_praise_at = now
-                            praise = f"Shabash {cfg.user_name}! Full focus mode looks so good on you — paani ka ek sip le lo aur keep winning!"
+                            praise = "Shabash! Tumne kitne achhe se focus banaya hua hai — paani ka ek sip le lo aur keep going!"
                             self.events.put(CompanionEvent("speak", text=praise, expression="super_proud", duration_sec=6.5))
 
                 # 3. Periodic wellness check-in (respecting configured interval)

@@ -66,6 +66,7 @@ class TimeRoutineEngine:
         meals = summary.get("meals", [])
         meal_types = {str(x.get("meal_type", "")).lower() for x in meals}
         water = summary.get("state", {}).get("water_count", 0)
+        call = f"{user_name.strip()}, " if (user_name or "").strip() and user_name.strip().lower() not in {"partner", "user", "boss"} else ""
 
         # 1. Morning Briefing (06:00 - 10:30)
         if 6 <= h <= 10 and summary.get("state", {}).get("morning_briefing_done", 0) == 0 and "morning" not in self._fired_slots:
@@ -75,8 +76,8 @@ class TimeRoutineEngine:
                 event_type="morning_briefing",
                 expression="morning_hype",
                 move_mode="run",
-                prompt_hint=f"It's {time_str} morning! Give an energetic, loving morning greeting, remind about water & breakfast, and ask what today's winning plan is.",
-                fallback_text=f"Good morning {user_name}! {time_str} ho gaya — naya din hai aur aaj jeetna hai! Paani piyo, breakfast karo aur batao aaj ka plan kya hai?",
+                prompt_hint=f"It's {time_str} morning! Give a warm, genuine morning greeting in natural Hinglish ('suno na', 'tumne/aapne'), remind about water & breakfast, and ask what today's plan is.",
+                fallback_text=f"Good morning! {call}{time_str} ho gaya — uth gaye tum? Paani piyo, breakfast karo aur batao aaj ka plan kya hai!",
             )
 
         # 2. Breakfast check (09:30 - 11:00) if not logged
@@ -88,8 +89,8 @@ class TimeRoutineEngine:
                     event_type="checkin",
                     expression="breakfast_reminder",
                     move_mode="walk",
-                    prompt_hint=f"It's {time_str} and they haven't logged breakfast yet. Lovingly nudge them to eat breakfast.",
-                    fallback_text=f"Suno {user_name}, {time_str} baj gaye! Breakfast kiya kya? Khali pet kaam mat karo please, kuch achha kha lo.",
+                    prompt_hint=f"It's {time_str} and they haven't logged breakfast yet. Lovingly ask 'tumne breakfast kiya?' in natural Hinglish.",
+                    fallback_text=f"Suno na, {call}{time_str} baj gaye! Tumne breakfast kiya kya? Khali pet kaam mat karo please.",
                 )
 
         # 3. Lunch check (13:00 - 14:30) if not logged
@@ -100,8 +101,8 @@ class TimeRoutineEngine:
                 event_type="checkin",
                 expression="lunch_time",
                 move_mode="run",
-                prompt_hint=f"It's {time_str} lunch time and no lunch is logged yet! Run over playfully and remind them to take a real lunch break.",
-                fallback_text=f"Arey {user_name}, {time_str} ho gaya — lunch time! Screen se 15 minute break lo aur pet bhar ke lunch karo.",
+                prompt_hint=f"It's {time_str} lunch time and no lunch is logged yet! Run over playfully and ask 'aapne lunch kiya?' in natural Hinglish.",
+                fallback_text=f"Arey suno, {call}{time_str} ho gaya — lunch time! Screen se 15 minute break lo aur achhe se lunch karo.",
             )
 
         # 4. Afternoon Chai / Stretch Break (16:30 - 17:45)
@@ -112,8 +113,8 @@ class TimeRoutineEngine:
                 event_type="checkin",
                 expression="chai_break",
                 move_mode="walk",
-                prompt_hint=f"It's {time_str} afternoon chai/snack time! Suggest a quick stretch, water/chai break, and check how their plan is going.",
-                fallback_text=f"Suno {user_name}, {time_str} ho gaye — chai break aur 2 minute stretch banta hai! Mind fresh lag raha hai?",
+                prompt_hint=f"It's {time_str} afternoon chai/snack time! Suggest a quick stretch and chai/water break in natural Hinglish.",
+                fallback_text=f"Suno na, {call}{time_str} ho gaye — chai break aur 2 minute stretch banta hai! Thak toh nahi gaye?",
             )
 
         # 5. Dinner check (20:30 - 22:00) if not logged
@@ -124,8 +125,8 @@ class TimeRoutineEngine:
                 event_type="checkin",
                 expression="dinner_time",
                 move_mode="walk",
-                prompt_hint=f"It's {time_str} evening dinner time and no dinner is logged yet. Warmly ask if they ate dinner and how their day went.",
-                fallback_text=f"Hey {user_name}, {time_str} baj gaye! Dinner kar liya kya? Aur aaj ka din kaisa raha, mujhe batao!",
+                prompt_hint=f"It's {time_str} evening dinner time and no dinner is logged yet. Warmly ask 'tumne dinner kar liya?' and how their day went.",
+                fallback_text=f"Hey suno, {call}{time_str} baj gaye! Tumne dinner kar liya kya? Aur aaj ka din kaisa raha?",
             )
 
         # 6. Late Night / Sleep Care (23:30 - 05:00, once per hour)
@@ -138,8 +139,8 @@ class TimeRoutineEngine:
                     event_type="checkin",
                     expression="go_to_sleep_please" if h >= 1 else "cozy_night",
                     move_mode="walk",
-                    prompt_hint=f"It's late night ({time_str})! You're a little sleepy and worried about their health — lovingly remind them of the exact time, ask if they're wrapping up soon, and tell them to rest their eyes and drink water.",
-                    fallback_text=f"Arey {user_name}, dekho toh {time_str} baj gaye hain! Main bhi thodi sleepy ho rahi hoon... thoda paani piyo aur jaldi wrap up karke so jao please.",
+                    prompt_hint=f"It's late night ({time_str})! You're sleepy and worried about their health — lovingly remind them of the time and tell them to rest soon.",
+                    fallback_text=f"Arey dekho na, {call}{time_str} baj gaye hain! Main bhi sleepy ho rahi hoon... paani piyo aur jaldi so jao please.",
                 )
 
         # 7. Periodic Hydration Check (every 2 hours between 10 AM and 8 PM if water is low)
@@ -152,8 +153,8 @@ class TimeRoutineEngine:
                     event_type="checkin",
                     expression="hydration_nudge",
                     move_mode="walk",
-                    prompt_hint=f"It's {time_str} and they've only logged {water} glasses of water today. Give a cute 1-2 sentence hydration nudge.",
-                    fallback_text=f"Suno {user_name}, {time_str} ho gaya aur abhi sirf {water} glass paani! Chalo ek glass paani pi lo mere liye.",
+                    prompt_hint=f"It's {time_str} and they've only logged {water} glasses of water today. Give a cute 1-sentence Hinglish hydration nudge.",
+                    fallback_text=f"Suno na, {call}{time_str} ho gaya aur tumne abhi sirf {water} glass paani piya! Ek glass paani pi lo na.",
                 )
 
         return None

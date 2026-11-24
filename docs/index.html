@@ -280,6 +280,7 @@
         <span>Simi Companion</span>
       </div>
       <div class="nav-links">
+        <a href="#demo-video">Watch Demo</a>
         <a href="#features">Features</a>
         <a href="#sprites">108 Expressions</a>
         <a href="#create">Create Your Own</a>
@@ -325,6 +326,17 @@
       </div>
     </section>
 
+    <section id="demo-video">
+      <h2>Watch How Simi Works</h2>
+      <p class="section-sub">See her animated walking, running, lip-sync mouth, distraction catching, 24/7 clock routines, and expressive Indian Hinglish voice in action.</p>
+      <div class="stage-card" style="padding:14px;">
+        <video controls playsinline preload="metadata" style="width:100%;border-radius:12px;display:block;background:#0a0d14;">
+          <source src="assets/simi_demo.mp4" type="video/mp4" />
+          Your browser does not support HTML5 video.
+        </video>
+      </div>
+    </section>
+
     <section id="features">
       <h2>Built to Feel Alive, Not Like a Tool</h2>
       <p class="section-sub">100% local SQLite memory, zero heavy downloads required, and fully customizable for anyone.</p>
@@ -342,16 +354,16 @@
           <p>Knows the exact time—morning hype, breakfast/lunch/dinner reminders, afternoon chai breaks, hydration nudges, and sleepy late-night care.</p>
         </div>
         <div class="card">
-          <h3>Screen &amp; Focus Guardian</h3>
-          <p>Tracks your active Windows app locally, saves optional local screenshots, and lovingly pulls you back if you drift onto Reels or YouTube.</p>
+          <h3>Genuine Expressive Hinglish Voice</h3>
+          <p>Uses Microsoft's <code>en-IN-NeerjaExpressiveNeural</code> voice speaking warmly like a real companion ("Suno na, tumne khana khaya?", "Aapne yeh kar diya?").</p>
         </div>
         <div class="card">
-          <h3>Natural Human Chat Memory</h3>
-          <p>Just click her and talk naturally ("I ate poha and drank 2 glasses of water"). She logs meals, water, plans, and moods automatically.</p>
+          <h3>Interview &amp; Study Prep Mode</h3>
+          <p>Practice before interviews or exams with mock technical/HR questions, STAR-method feedback, concept quizzing, and pre-test calm coaching.</p>
         </div>
         <div class="card">
-          <h3>Bring Your Own AI &amp; Voice</h3>
-          <p>Works with free Google Gemini, Groq, local Ollama, or offline Built-in mode, plus neural Indian English, Hindi, US, and UK voices.</p>
+          <h3>Meeting / Screen-Share Pause</h3>
+          <p>One click cleanly hides Simi to the Windows system tray and pauses voice/screen checks during presentations or screen shares.</p>
         </div>
       </div>
     </section>
@@ -383,14 +395,15 @@
             <input id="bCompName" value="Simi" oninput="renderBuilder()" />
           </div>
           <div class="field">
-            <label>What Should They Call You?</label>
-            <input id="bUserName" value="Partner" oninput="renderBuilder()" />
+            <label>Your First Name (leave blank for natural "suno na / tumne / aapne")</label>
+            <input id="bUserName" value="" placeholder="Optional first name" oninput="renderBuilder()" />
           </div>
           <div class="field">
             <label>Voice Accent (edge-tts Neural Voice)</label>
             <select id="bVoice" onchange="renderBuilder()">
-              <option value="en-IN-NeerjaNeural">Indian English — Female (Neerja)</option>
+              <option value="en-IN-NeerjaExpressiveNeural">Indian English — Expressive Female (Neerja)</option>
               <option value="hi-IN-SwaraNeural">Hindi — Female (Swara)</option>
+              <option value="en-IN-NeerjaNeural">Indian English — Classic Female (Neerja)</option>
               <option value="en-US-JennyNeural">US English — Female (Jenny)</option>
               <option value="en-GB-SoniaNeural">British English — Female (Sonia)</option>
               <option value="en-IN-PrabhatNeural">Indian English — Male (Prabhat)</option>
@@ -502,12 +515,13 @@ python run_simi.py</pre>
     function getBuilderConfig() {
       return {
         assistant_name: document.getElementById('bCompName').value.trim() || 'Simi',
-        user_name: document.getElementById('bUserName').value.trim() || 'Partner',
+        user_name: document.getElementById('bUserName').value.trim(),
         voice_name: document.getElementById('bVoice').value,
         voice_enabled: true,
         ai_provider: document.getElementById('bProvider').value,
         gemini_model: 'gemini-flash-lite-latest',
         screen_monitor_enabled: true,
+        interview_prep_mode: false,
         checkin_interval_min: 45
       };
     }

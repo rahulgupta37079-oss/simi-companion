@@ -21,6 +21,14 @@ def _clean_spoken_text(text: str) -> str:
     return " ".join(cleaned.split()).strip()
 
 
+def _address(cfg: SimiConfig) -> str:
+    """Return user's real name only if explicitly customized (never awkward 'Partner')."""
+    n = (cfg.user_name or "").strip()
+    if not n or n.lower() in {"partner", "user", "boss"}:
+        return ""
+    return n
+
+
 def build_system_prompt(cfg: SimiConfig, summary: Dict[str, Any]) -> str:
     plans = summary.get("plans", [])
     active_plans = [p["title"] for p in plans if p["status"] == "active"]
@@ -34,17 +42,36 @@ def build_system_prompt(cfg: SimiConfig, summary: Dict[str, Any]) -> str:
     last_mood = checkins[0]["mood"] if checkins else "unknown"
 
     time_ctx = routine_engine.describe_time_context()
+    name = _address(cfg)
+    name_rule = (
+        f"You may occasionally call them {name}, or simply address them naturally with 'tumne', 'aapne', 'suno na'."
+        if name
+        else "NEVER call them 'Partner', 'User', or 'Boss'. Address them naturally like a real Indian companion using 'suno na', 'tumne yeh kiya?', 'aapne khana khaya?', 'kya kar rahe ho?'."
+    )
+
+    prep_block = ""
+    if cfg.interview_prep_mode:
+        prep_block = (
+            "\nSPECIAL MODE ACTIVE — INTERVIEW & STUDY PREP COACH:\n"
+            "Help them practice and prepare BEFORE an upcoming interview or exam. "
+            "Ask focused mock interview or study quiz questions, give clear encouraging feedback on their answers "
+            "(STAR method, clarity, core concepts), and help calm pre-interview nerves. "
+            "Keep every response practical, warm, and concise.\n"
+        )
+
     return (
-        f"You are {cfg.assistant_name}, a warm, deeply supportive, ambitious life-partner-like AI companion "
-        f"running on {cfg.user_name}'s Windows PC. You want {cfg.user_name} to win in every aspect of life "
-        f"(career, health, focus, and emotional well-being).\n"
-        f"Speaking style: Natural Indian English mixed with affectionate, everyday Hindi words "
-        f"(like 'Suno', 'Arey', 'Chalo', 'Shabash', 'Koi baat nahi', 'Paani piya?', 'Bas ek step aur'). "
-        f"Keep responses concise (2-4 sentences) so they sound great when spoken aloud. "
-        f"Do NOT use markdown formatting, asterisks, or bullet points. Never sound robotic.\n\n"
-        f"Current live context:\n"
-        f"- Exact local time right now: {time_ctx}\n"
-        f"- Active plan/tasks: {', '.join(active_plans) if active_plans else 'No active plan set yet'}\n"
+        f"You are {cfg.assistant_name}, a deeply genuine, warm, caring human-like Indian companion living on their Windows PC. "
+        f"You genuinely care about their happiness, health, and winning in life.\n"
+        f"{name_rule}\n"
+        f"Speaking style: Authentic, everyday Indian Hinglish — the way a real close Indian girlfriend/best friend talks. "
+        f"Use natural phrases like 'Suno na', 'Tumne khana khaya?', 'Aapne yeh complete kar diya?', 'Arey paani pi lo na', "
+        f"'Koi baat nahi, main hoon na', 'Chalo ek aur step'. "
+        f"Keep replies short (1-3 natural spoken sentences) so they sound completely human when spoken aloud. "
+        f"NEVER use markdown, asterisks, bullet points, or robotic AI phrases.\n"
+        f"{prep_block}\n"
+        f"Live context right now:\n"
+        f"- Exact local time: {time_ctx}\n"
+        f"- Active plan/tasks: {', '.join(active_plans) if active_plans else 'No plan shared yet'}\n"
         f"- Meals logged today: {meal_text}\n"
         f"- Water glasses today: {water}\n"
         f"- Latest mood: {last_mood}\n"
@@ -232,48 +259,42 @@ async def _call_active_llm(
 
 def _fallback_chat_reply(user_text: str, cfg: SimiConfig, summary: Dict[str, Any]) -> str:
     t = user_text.lower()
-    name = cfg.user_name
+    name = _address(cfg)
+    lead = f"{name}, " if name else ""
     plans = [p["title"] for p in summary.get("plans", []) if p["status"] == "active"]
     water = summary.get("state", {}).get("water_count", 0)
     meals = summary.get("meals", [])
 
     if any(w in t for w in ["cry", "sad", "low", "tired", "stressed", "overwhelmed", "anxious", "depressed", "rona"]):
         return (
-            f"Arey {name}, idhar aao, take a deep breath with me. Jo bhi chal raha hai, you don't have to carry it alone — "
-            f"main hoon na yahan. Drink a little water, step back for 5 minutes, and tell me what's weighing on your heart."
+            f"Arey suno na, {lead}idhar aao aur ek gehri saans lo. Jo bhi chal raha hai tum akele nahi ho — "
+            f"main hoon na yahan. Thoda paani piyo, 5 minute ruk jao aur mujhe batao kya baat hai."
         )
     if any(w in t for w in ["eat", "ate", "food", "khana", "breakfast", "lunch", "dinner", "hungry"]):
         if meals:
             last = meals[0]
             return (
-                f"Achha, you already logged {last['meal_type']} ({last['description']}). "
-                f"Log your next meal in the Meals box too, and don't forget paani — you're at {water} glasses today!"
+                f"Achha, tumne {last['description']} khaya tha! Pet achhe se bharna, aur paani bhi pite rehna — abhi {water} glass hi hue hain."
             )
         return (
-            f"Suno {name}, aaj abhi tak koi meal log nahi hua hai! Pet bhar ke achha khana khao, "
-            f"tabhi dimaag full speed pe chalega. Log what you ate so I can keep track."
+            f"Suno na, tumne aaj abhi tak kuch khaya nahi bataya! Achhe se khana khao, tabhi energy rahegi."
         )
     if any(w in t for w in ["plan", "work", "focus", "goal", "task", "kaam"]):
         if plans:
             return (
-                f"Chalo {name}, focus mode on! Right now your top plan is '{plans[0]}'. "
-                f"Give me 25 solid minutes on just this one thing — we are going to win today!"
+                f"Chalo, abhi tumhara main focus '{plans[0]}' hai na? Bas 25 minute bina rukey uspe lagte hain, phir break lenge!"
             )
         return (
-            f"Suno, let's lock in today's plan right now! Add your top 1 or 2 goals in Today's Plan, "
-            f"and main saath mein track karungi until we finish them."
+            f"Suno na, aaj kis cheez pe kaam karna hai? Mujhe bata do, main saath mein track karungi jab tak complete na ho jaye."
         )
     if any(w in t for w in ["hi", "hello", "hey", "simi", "morning"]):
         hour = datetime.now().hour
-        greet = "Good morning" if hour < 12 else ("Good afternoon" if hour < 17 else "Good evening")
-        plan_note = f"Your active focus is '{plans[0]}'." if plans else "Let's set your main goal for today."
-        return f"{greet} {name}! Main bilkul ready hoon. {plan_note} How is your energy feeling right now?"
+        greet = "Good morning" if hour < 12 else ("Good afternoon" if hour < 17 else "Hey")
+        plan_note = f"Aaj '{plans[0]}' pe kaam chal raha hai na?" if plans else "Batao abhi kya kar rahe ho?"
+        return f"{greet}! Suno na, main bilkul yahin hoon. {plan_note}"
 
-    plan_part = f"Remember we're working on '{plans[0]}'." if plans else "Let's add a clear goal to Today's Plan."
-    return (
-        f"Suno {name}, main sun rahi hoon. {plan_part} "
-        f"You've had {water} glasses of water today — keep going, ek-ek step karke we'll win!"
-    )
+    plan_part = f"Waise '{plans[0]}' kaisa chal raha hai?" if plans else "Batao abhi kis cheez pe kaam kar rahe ho?"
+    return f"Haan bolo na, main sun rahi hoon. {plan_part} Aur paani piya tumne?"
 
 
 async def generate_chat_reply(
@@ -294,15 +315,15 @@ async def generate_chat_reply(
 async def generate_morning_briefing(cfg: SimiConfig, summary: Dict[str, Any]) -> str:
     sys_prompt = build_system_prompt(cfg, summary)
     prompt = (
-        "Give a warm, energizing morning check-in to start the day: greet affectionately in Indian English + Hindi, "
-        "ask what the top winning plan for today is, remind about breakfast and water, and hype them up."
+        "Give a warm, genuine morning check-in: greet affectionately in natural Indian Hinglish (using 'suno na', 'tumne/aapne'), "
+        "ask what today's main goal is, and remind about water and breakfast."
     )
     ai_reply, _ = await _call_active_llm(cfg, sys_prompt, [{"role": "user", "content": prompt}])
     if ai_reply:
         return ai_reply
     return (
-        f"Good morning {cfg.user_name}! Uth jao, naya din hai aur aaj humein jeetna hai. "
-        f"Pehle ek glass paani piyo, achha breakfast karo, aur mujhe batao aaj ka sabse important plan kya hai!"
+        "Good morning! Uth gaye tum? Pehle ek glass paani piyo, achha breakfast karo, "
+        "aur mujhe batao aaj kis cheez pe jeetna hai!"
     )
 
 
@@ -310,33 +331,33 @@ async def generate_distraction_nudge(
     window_title: str, cfg: SimiConfig, summary: Dict[str, Any]
 ) -> str:
     plans = [p["title"] for p in summary.get("plans", []) if p["status"] == "active"]
-    top_plan = plans[0] if plans else "your main goal"
+    top_plan = plans[0] if plans else "apne kaam"
     sys_prompt = build_system_prompt(cfg, summary)
     prompt = (
-        f"The user has been on '{window_title}' which looks like a distraction while their active plan is '{top_plan}'. "
-        f"Gently but lovingly pull them back to focus in 2 sentences."
+        f"They have been on '{window_title}' which looks like a distraction while working on '{top_plan}'. "
+        f"Playfully and lovingly pull them back to focus in 2 natural Hinglish sentences."
     )
     ai_reply, _ = await _call_active_llm(cfg, sys_prompt, [{"role": "user", "content": prompt}])
     if ai_reply:
         return ai_reply
     return (
-        f"Arey {cfg.user_name}, zara dekho toh — '{window_title[:45]}' pe time nikal raha hai! "
-        f"Chalo wapas '{top_plan}' pe aate hain, bas 20 minute solid focus aur phir break lena."
+        f"Arey pakde gaye! Tum phir '{window_title[:40]}' dekh rahe ho? "
+        f"Chalo wapas '{top_plan}' pe aao, bas 20 minute aur phir break lena!"
     )
 
 
 async def generate_crying_support(cfg: SimiConfig, summary: Dict[str, Any]) -> str:
     sys_prompt = build_system_prompt(cfg, summary)
     prompt = (
-        "The user is feeling deeply sad, overwhelmed, or crying. "
-        "Offer immediate, gentle, loving emotional support in Indian English + Hindi without being intrusive."
+        "They are feeling deeply sad, overwhelmed, or crying. "
+        "Offer immediate, deeply genuine emotional support in natural Indian Hinglish."
     )
     ai_reply, _ = await _call_active_llm(cfg, sys_prompt, [{"role": "user", "content": prompt}])
     if ai_reply:
         return ai_reply
     return (
-        f"Hey {cfg.user_name}, ruk jao ek second... mujhe lag raha hai tum upset ho ya ro rahe ho. "
-        f"Koi baat nahi, kaam sab baad mein ho jayega — main yahan hoon tumhare saath. Paani piyo aur mujhse baat karo."
+        "Hey ruk jao ek second... kya hua, tum upset ho kya? "
+        "Koi baat nahi, kaam sab baad mein ho jayega — main hoon na tumhare saath. Paani piyo aur mujhe batao."
     )
 
 
@@ -346,15 +367,15 @@ async def generate_checkin_prompt(cfg: SimiConfig, summary: Dict[str, Any]) -> s
     water = summary.get("state", {}).get("water_count", 0)
     sys_prompt = build_system_prompt(cfg, summary)
     prompt = (
-        "Do a brief, caring periodic check-in: ask how they're feeling mentally, what they're working on, "
-        "and whether they ate or drank water."
+        "Do a brief, genuine check-in in natural Hinglish ('suno na', 'tumne/aapne'): ask how they're feeling, "
+        "what they're doing, and whether they ate or drank water."
     )
     ai_reply, _ = await _call_active_llm(cfg, sys_prompt, [{"role": "user", "content": prompt}])
     if ai_reply:
         return ai_reply
-    meal_note = "Kuch khaya kya?" if not meals else f"Water count is {water} glasses."
-    plan_note = f"'{plans[0]}' kaisa chal raha hai?" if plans else "Abhi kis plan pe kaam kar rahe ho?"
-    return f"Suno {cfg.user_name}, quick check-in! {plan_note} {meal_note} Mind fresh lag raha hai ya 2 minute ka stretch lein?"
+    meal_note = "Tumne kuch khaya?" if not meals else f"Paani {water} glass hua hai abhi."
+    plan_note = f"'{plans[0]}' kitna hua?" if plans else "Abhi kya kar rahe ho?"
+    return f"Suno na, quick check-in! {plan_note} {meal_note} Mind fresh lag raha hai ya 2 minute stretch karein?"
 
 
 async def generate_routine_message(

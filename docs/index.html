@@ -64,6 +64,30 @@
     .btn:hover { transform: translateY(-1px); text-decoration: none; }
     .btn-primary { background: linear-gradient(135deg, var(--amber), var(--pink)); color: #111827; }
     .btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+    .btn-support { background: rgba(244, 114, 182, 0.16); color: #fbcfe8; border: 1px solid rgba(244, 114, 182, 0.5); }
+
+    .modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(6px);
+      place-items: center;
+      z-index: 100;
+      padding: 18px;
+    }
+    .modal-bg.open { display: grid; }
+    .modal-card {
+      width: min(460px, 100%);
+      background: var(--surface);
+      border: 1px solid rgba(244, 114, 182, 0.45);
+      border-radius: 16px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+    }
 
     .hero {
       display: grid;
@@ -282,9 +306,9 @@
       <div class="nav-links">
         <a href="#studio-3d">3D Model</a>
         <a href="#demo-video">Watch Demo</a>
-        <a href="#features">Features</a>
         <a href="#create">Create Your Own</a>
-        <a class="btn btn-primary" href="3d-studio.html">Open 3D Studio</a>
+        <a href="preorder.html" style="color:#fde68a;font-weight:700;">Pre-Order Desk Mini</a>
+        <button class="btn btn-support" onclick="openSupportModal()">♥ Support Creator</button>
       </div>
     </nav>
 
@@ -296,9 +320,9 @@
           No ugly browser dashboards. Meet <strong>Simi</strong>—an autonomous animated buddy who walks and runs along your taskbar, speaks with an animated lip-sync mouth, watches out for distractions, remembers your meals &amp; plans from natural chat, and cares for your well-being 24/7.
         </p>
         <div class="cta-row">
-          <a class="btn btn-primary" href="3d-studio.html">Launch Interactive 3D Model</a>
-          <a class="btn btn-ghost" href="assets/simi_3d_model.glb" download>Download .GLB 3D File</a>
-          <a class="btn btn-ghost" href="#create">Create Your Own</a>
+          <a class="btn btn-primary" href="preorder.html">Pre-Order Physical Desk Mini</a>
+          <a class="btn btn-ghost" href="3d-studio.html">Open 3D Studio</a>
+          <button class="btn btn-support" onclick="openSupportModal()">♥ Support Creator</button>
         </div>
       </div>
 
@@ -449,9 +473,44 @@ python run_simi.py</pre>
       </div>
     </section>
 
+    <section>
+      <div class="stage-card" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;padding:24px 28px;border-color:rgba(244,114,182,0.4);">
+        <div style="max-width:650px;">
+          <span class="badge" style="margin-bottom:8px;">Hardware Pre-Order • Batch 01</span>
+          <h2 style="margin:0 0 8px;">Want Simi Physically Sitting on Your Desk?</h2>
+          <p style="margin:0;color:var(--muted);font-size:15px;">Reserve <strong>Simi Mini</strong> — a palm-sized ESP32-S3 animated desk companion pod with crisp expression display, voice check-ins, touch-to-comfort sensor, and Wi-Fi sync with your PC.</p>
+        </div>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="preorder.html">Pre-Order Simi Mini →</a>
+          <button class="btn btn-support" onclick="openSupportModal()">♥ Support Creator</button>
+        </div>
+      </div>
+    </section>
+
     <footer>
-      Built with love as an open-source project by <a href="https://github.com/rahulgupta37079-oss" target="_blank">rahulgupta37079-oss</a> • Licensed under MIT • Create your own companion and share it with the community!
+      Built with love as an open-source project by <a href="https://github.com/rahulgupta37079-oss" target="_blank">rahulgupta37079-oss</a> • Licensed under MIT • <a href="preorder.html">Pre-Order Simi Mini</a> • <a href="#" onclick="openSupportModal();return false;">Support Creator</a>
     </footer>
+  </div>
+
+  <div class="modal-bg" id="supportModal" onclick="if(event.target===this) closeSupportModal()">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="margin:0;">♥ Support the Creator</h3>
+        <button class="chip" onclick="closeSupportModal()">Close</button>
+      </div>
+      <p style="margin:0;font-size:14px;color:var(--muted);">
+        Simi is free &amp; open-source! Your support helps Rahul build new 3D models, expressive voices, and the Simi Mini physical desk companion.
+      </p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="chip" onclick="setSupAmount('₹99 / $2 Chai')">₹99 Chai</button>
+        <button class="chip" onclick="setSupAmount('₹299 / $5 Supporter')">₹299 Support</button>
+        <button class="chip" onclick="setSupAmount('₹999 / $15 Hardware Backer')">₹999 Backer</button>
+      </div>
+      <div id="supNote" style="font-size:13px;color:#fde68a;">Selected: ₹299 / $5 Supporter</div>
+      <a class="btn btn-primary" href="https://github.com/sponsors/rahulgupta37079-oss" target="_blank">Sponsor on GitHub</a>
+      <a class="btn btn-ghost" id="supMailBtn" href="mailto:rahulgupta37079@gmail.com?subject=Supporting%20Simi%20Creator&body=Hi%20Rahul%2C%20I%27d%20love%20to%20support%20Simi!%20Please%20share%20your%20UPI%20%2F%20payment%20link.">Pay via UPI / PayPal (Contact Creator)</a>
+      <a class="btn btn-ghost" href="preorder.html#support">Or Back a Simi Mini Desk Pod →</a>
+    </div>
   </div>
 
   <script>
@@ -550,6 +609,19 @@ python run_simi.py</pre>
     function copyInstall() {
       navigator.clipboard.writeText(document.getElementById('installCmd').textContent);
       alert('Copied quick-start commands!');
+    }
+
+    function openSupportModal() {
+      document.getElementById('supportModal').classList.add('open');
+    }
+    function closeSupportModal() {
+      document.getElementById('supportModal').classList.remove('open');
+    }
+    function setSupAmount(label) {
+      document.getElementById('supNote').textContent = 'Selected: ' + label;
+      const s = encodeURIComponent('Supporting Simi Creator — ' + label);
+      const b = encodeURIComponent(`Hi Rahul,\n\nI'd love to support Simi (${label}). Please send your UPI ID or payment link!\n`);
+      document.getElementById('supMailBtn').href = `mailto:rahulgupta37079@gmail.com?subject=${s}&body=${b}`;
     }
 
     renderBuilder();

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-Order Simi Mini — Physical Desk Companion</title>
+  <meta name="description" content="Pre-order Simi Mini — a small physical AI desk companion that sits right on your desk with animated expressions, voice check-ins, and sync with the open-source Simi app." />
+  <style>
+    :root {
+      --bg: #0c0e14;
+      --surface: #151924;
+      --surface-2: #1c2231;
+      --border: #2a3247;
+      --text: #f3f5fa;
+      --muted: #9aa4bc;
+      --amber: #f59e0b;
+      --pink: #f472b6;
+      --green: #22c55e;
+      --blue: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 8%, rgba(244, 114, 182, 0.16), transparent 36%),
+                  radial-gradient(circle at 82% 18%, rgba(245, 158, 11, 0.14), transparent 38%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--amber); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 22px; }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 19px; color: #fff; }
+    .logo img { width: 34px; height: 34px; object-fit: contain; border-radius: 50%; background: rgba(244,114,182,0.18); padding: 2px; }
+    .nav-links { display: flex; gap: 16px; align-items: center; font-size: 14px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.14s ease;
+    }
+    .btn:hover { transform: translateY(-1px); text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, var(--amber), var(--pink)); color: #111827; }
+    .btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+    .btn-support { background: rgba(244, 114, 182, 0.16); color: #fbcfe8; border: 1px solid rgba(244, 114, 182, 0.5); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.1fr 0.95fr;
+      gap: 32px;
+      align-items: center;
+      padding: 52px 0 36px;
+    }
+    @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } }
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fde68a;
+      background: rgba(245, 158, 11, 0.16);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      margin-bottom: 14px;
+    }
+    h1 { font-size: clamp(32px, 4.4vw, 48px); line-height: 1.12; margin: 0 0 14px; }
+    .gradient-text {
+      background: linear-gradient(135deg, #fde68a, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .lead { font-size: 16px; color: var(--muted); margin: 0 0 22px; }
+
+    /* Physical Desk Pod Showcase Card */
+    .pod-card {
+      background: linear-gradient(180deg, #181e2f, #10141f);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 26px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.48);
+    }
+    .pod-shell {
+      position: relative;
+      width: 240px;
+      height: 255px;
+      margin: 0 auto 14px;
+      border-radius: 42px 42px 30px 30px;
+      background: linear-gradient(145deg, #2b3248, #171c2b);
+      border: 3px solid rgba(244, 114, 182, 0.45);
+      box-shadow: inset 0 4px 16px rgba(255,255,255,0.08), 0 18px 40px rgba(0,0,0,0.55);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .pod-screen {
+      width: 196px;
+      height: 185px;
+      border-radius: 24px;
+      background: radial-gradient(circle at 50% 60%, #261b34, #0d1019);
+      border: 2px solid #090b12;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+    .pod-screen img {
+      height: 132px;
+      object-fit: contain;
+      animation: bob 2.2s ease-in-out infinite;
+    }
+    .pod-status {
+      font-size: 11px;
+      color: #fde68a;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+    .pod-led {
+      width: 44px;
+      height: 5px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--amber), var(--pink));
+      margin-top: 12px;
+      box-shadow: 0 0 12px var(--pink);
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-6px); }
+    }
+
+    section { padding: 38px 0; }
+    h2 { font-size: 28px; margin: 0 0 8px; }
+    .sub { color: var(--muted); margin: 0 0 24px; }
+
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 860px) { .grid-3 { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 15px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card.featured {
+      border-color: var(--pink);
+      box-shadow: 0 0 28px rgba(244, 114, 182, 0.18);
+    }
+    .price { font-size: 28px; font-weight: 800; color: #fff; }
+    .price small { font-size: 13px; font-weight: 500; color: var(--muted); }
+    ul.specs { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13.5px; display: flex; flex-direction: column; gap: 6px; }
+
+    .form-box {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+    }
+    @media (max-width: 860px) { .form-box { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .field input, .field select, .field textarea {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--pink); }
+
+    .support-box {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(244, 114, 182, 0.12));
+      border: 1px solid rgba(244, 114, 182, 0.35);
+      border-radius: 16px;
+      padding: 22px;
+    }
+    .tier-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .tier {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 13px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tier.active, .tier:hover { border-color: var(--amber); color: #fde68a; background: rgba(245, 158, 11, 0.18); }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 26px 0 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <a class="logo" href="index.html">
+        <img src="assets/simi_idle.png" alt="Simi" />
+        <span>Simi</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">← Home</a>
+        <a href="3d-studio.html">3D Studio</a>
+        <a href="#reserve">Pre-Order</a>
+        <a class="btn btn-support" href="#support">♥ Support Creator</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <span class="badge">Batch 01 Early Access • Limited Founder Units</span>
+        <h1>Meet <span class="gradient-text">Simi Mini</span> — Your Physical Desk Companion</h1>
+        <p class="lead">
+          Bring Simi off your monitor and right onto your physical desk! A compact, palm-sized animated companion pod with a crisp expression screen, warm Hinglish voice speaker, touch-to-comfort head sensor, and seamless Wi-Fi sync with the open-source Simi app.
+        </p>
+        <div style="display:flex;flex-wrap:wrap;gap:12px;">
+          <a class="btn btn-primary" href="#reserve">Reserve Batch 01 Pre-Order</a>
+          <a class="btn btn-ghost" href="3d-studio.html">Inspect 3D Model</a>
+        </div>
+      </div>
+
+      <div class="pod-card">
+        <div class="pod-shell">
+          <div class="pod-screen">
+            <img id="podSprite" src="assets/simi_idle.png" alt="Simi Mini Desk Pod" />
+            <div class="pod-status" id="podText">Suno na, paani piya?</div>
+          </div>
+          <div class="pod-led"></div>
+        </div>
+        <div style="font-size:13px;color:var(--muted);">
+          9.5 cm Tall • ESP32-S3 Powered • Custom 3D-Printed Shell • USB-C
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>What's Inside Simi Mini</h2>
+      <p class="sub">Designed by makers, for makers—open-source firmware you can customize anytime.</p>
+      <div class="grid-3">
+        <div class="card">
+          <h3>Vivid Animated Display</h3>
+          <p style="color:var(--muted);font-size:14px;margin:0;">High-brightness IPS display rendering Simi's 108 expressions, sleepy late-night eyes, hearts, and live clock right on your desk.</p>
+        </div>
+        <div class="card">
+          <h3>Built-in Voice &amp; Mic</h3>
+          <p style="color:var(--muted);font-size:14px;margin:0;">Talk directly to Simi Mini hands-free—warm Indian English/Hindi speaker check-ins for meals, hydration, focus, and emotional support.</p>
+        </div>
+        <div class="card">
+          <h3>Touch-to-Comfort Sensor</h3>
+          <p style="color:var(--muted);font-size:14px;margin:0;">Gently tap the top of her pod to trigger instant comfort mode, silence reminders, or start a 25-minute deep focus sprint.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Choose Your Pre-Order Edition</h2>
+      <p class="sub">Reserve your spot in Batch 01 with zero upfront obligation—pay only when your unit is ready to ship.</p>
+      <div class="grid-3">
+        <div class="card">
+          <span style="font-size:12px;color:var(--blue);font-weight:700;">FOR MAKERS</span>
+          <h3 style="margin:0;">DIY Maker Kit</h3>
+          <div class="price">₹1,499 <small>/ ~$19</small></div>
+          <ul class="specs">
+            <li>Pre-flashed ESP32-S3 + IPS screen + speaker</li>
+            <li>Custom 3D-printed shell (choice of color)</li>
+            <li>Full open-source STL + firmware access</li>
+          </ul>
+          <button class="btn btn-ghost" style="margin-top:auto;" onclick="selectEdition('DIY Maker Kit (₹1,499 / $19)')">Select Maker Kit</button>
+        </div>
+
+        <div class="card featured">
+          <span style="font-size:12px;color:var(--pink);font-weight:700;">MOST POPULAR • BATCH 01</span>
+          <h3 style="margin:0;">Simi Mini — Ready to Use</h3>
+          <div class="price">₹2,999 <small>/ ~$39</small></div>
+          <ul class="specs">
+            <li>Fully assembled &amp; tested desk companion pod</li>
+            <li>USB-C braided cable + matte desk stand</li>
+            <li>1-click Wi-Fi pairing with Simi Windows App</li>
+            <li>Early-bird lifetime firmware &amp; expression pack</li>
+          </ul>
+          <button class="btn btn-primary" style="margin-top:auto;" onclick="selectEdition('Simi Mini Ready-to-Use (₹2,999 / $39)')">Reserve Simi Mini</button>
+        </div>
+
+        <div class="card">
+          <span style="font-size:12px;color:var(--amber);font-weight:700;">BESPOKE GIFT</span>
+          <h3 style="margin:0;">Custom Partner Edition</h3>
+          <div class="price">₹4,499 <small>/ ~$59</small></div>
+          <ul class="specs">
+            <li>Everything in Simi Mini Ready-to-Use</li>
+            <li>Custom animated character based on your photo</li>
+            <li>Custom engraved name on desk base</li>
+            <li>Priority Batch 01 dispatch &amp; 1-on-1 setup</li>
+          </ul>
+          <button class="btn btn-ghost" style="margin-top:auto;" onclick="selectEdition('Custom Partner Edition (₹4,499 / $59)')">Reserve Custom Edition</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="reserve">
+      <h2>Reserve Your Simi Mini</h2>
+      <p class="sub">Fill in your details below to lock your Batch 01 pre-order slot directly with the creator.</p>
+      <div class="form-box">
+        <form onsubmit="submitPreorder(event)">
+          <div class="field">
+            <label>Your Full Name</label>
+            <input id="poName" required placeholder="e.g. Aarav Sharma" />
+          </div>
+          <div class="field">
+            <label>Email Address</label>
+            <input id="poEmail" type="email" required placeholder="you@example.com" />
+          </div>
+          <div class="field">
+            <label>Edition</label>
+            <select id="poEdition">
+              <option>Simi Mini Ready-to-Use (₹2,999 / $39)</option>
+              <option>DIY Maker Kit (₹1,499 / $19)</option>
+              <option>Custom Partner Edition (₹4,499 / $59)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>City &amp; Country (for shipping estimate)</label>
+            <input id="poLocation" required placeholder="e.g. Mumbai, India" />
+          </div>
+          <div class="field">
+            <label>Shell Color / Customization Notes (optional)</label>
+            <textarea id="poNotes" rows="3" placeholder="Pastel pink, matte black, custom character request..."></textarea>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary">Confirm Pre-Order Request</button>
+            <button type="button" class="btn btn-ghost" onclick="copyPreorder()">Copy Reservation Text</button>
+          </div>
+          <div id="poFeedback" style="font-size:13px;color:#86efac;margin-top:10px;"></div>
+        </form>
+
+        <div class="support-box" id="support">
+          <h3 style="margin:0 0 6px;">♥ Support the Creator</h3>
+          <p style="font-size:13.5px;color:var(--muted);margin:0;">
+            Simi is 100% open-source and free to download. Supporting the creator helps fund hardware prototypes, voice improvements, and community releases!
+          </p>
+          <div class="tier-row">
+            <button class="tier active" onclick="pickTip(this, '₹99 / $2 — Buy a Chai')">₹99 Chai</button>
+            <button class="tier" onclick="pickTip(this, '₹299 / $5 — Supporter')">₹299 Support</button>
+            <button class="tier" onclick="pickTip(this, '₹999 / $15 — Hardware Backer')">₹999 Backer</button>
+          </div>
+          <div style="background:rgba(12,14,20,0.65);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;margin-bottom:12px;">
+            <div style="color:var(--muted);font-size:11.5px;margin-bottom:4px;">DIRECT CREATOR CONTACT &amp; PAYMENT</div>
+            <div>Creator: <strong>Rahul Gupta</strong> (<code>rahulgupta37079-oss</code>)</div>
+            <div>Email / Support: <strong id="creatorEmail">rahulgupta37079@gmail.com</strong></div>
+            <div style="color:#fde68a;margin-top:4px;" id="selectedTipText">Selected: ₹99 / $2 — Buy a Chai</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <a class="btn btn-primary" id="sponsorLink" href="https://github.com/sponsors/rahulgupta37079-oss" target="_blank">Sponsor on GitHub</a>
+            <a class="btn btn-ghost" id="emailSupportLink" href="mailto:rahulgupta37079@gmail.com?subject=Supporting%20Simi%20Creator&body=Hi%20Rahul%2C%20I%27d%20love%20to%20support%20Simi%20(UPI%20%2F%20PayPal%20details%20please)!">Request UPI / PayPal Link via Email</a>
+            <button class="btn btn-ghost" type="button" onclick="copySupportEmail()">Copy Creator Email</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Simi • Open-Source Software + Physical Desk Companion by <a href="https://github.com/rahulgupta37079-oss" target="_blank">rahulgupta37079-oss</a>
+    </footer>
+  </div>
+
+  <script>
+    const podCycle = [
+      { img: 'assets/simi_idle.png', text: 'Suno na, paani piya?' },
+      { img: 'assets/simi_talk.png', text: 'Aapne yeh finish kar diya!' },
+      { img: 'assets/simi_laugh.png', text: 'Shabash! Proud of you!' },
+      { img: 'assets/simi_care.png', text: 'Main hoon na yahan ♥' },
+      { img: 'assets/simi_sleepy.png', text: 'Raat ho gayi, rest lo...' }
+    ];
+    let pIdx = 0;
+    setInterval(() => {
+      pIdx = (pIdx + 1) % podCycle.length;
+      document.getElementById('podSprite').src = podCycle[pIdx].img;
+      document.getElementById('podText').textContent = podCycle[pIdx].text;
+    }, 2800);
+
+    function selectEdition(ed) {
+      document.getElementById('poEdition').value = ed;
+      document.getElementById('reserve').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function buildReservationText() {
+      const name = document.getElementById('poName').value.trim();
+      const email = document.getElementById('poEmail').value.trim();
+      const edition = document.getElementById('poEdition').value;
+      const loc = document.getElementById('poLocation').value.trim();
+      const notes = document.getElementById('poNotes').value.trim() || 'None';
+      return `Simi Mini Batch 01 Pre-Order\nName: ${name}\nEmail: ${email}\nEdition: ${edition}\nLocation: ${loc}\nNotes: ${notes}`;
+    }
+
+    function submitPreorder(e) {
+      e.preventDefault();
+      const body = encodeURIComponent(buildReservationText());
+      const subj = encodeURIComponent('Simi Mini Pre-Order Reservation');
+      window.location.href = `mailto:rahulgupta37079@gmail.com?subject=${subj}&body=${body}`;
+      document.getElementById('poFeedback').textContent = 'Opening your email app with your Batch 01 reservation details! You can also click "Copy Reservation Text".';
+    }
+
+    function copyPreorder() {
+      navigator.clipboard.writeText(buildReservationText());
+      document.getElementById('poFeedback').textContent = 'Reservation details copied! Send them to rahulgupta37079@gmail.com.';
+    }
+
+    function pickTip(el, label) {
+      document.querySelectorAll('.tier').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById('selectedTipText').textContent = 'Selected: ' + label;
+      const subj = encodeURIComponent('Supporting Simi Creator — ' + label);
+      const body = encodeURIComponent(`Hi Rahul,\n\nI love Simi and would like to support you (${label}). Please share your UPI ID / payment link!\n`);
+      document.getElementById('emailSupportLink').href = `mailto:rahulgupta37079@gmail.com?subject=${subj}&body=${body}`;
+    }
+
+    function copySupportEmail() {
+      navigator.clipboard.writeText('rahulgupta37079@gmail.com');
+      alert('Copied creator email: rahulgupta37079@gmail.com');
+    }
+  </script>
+</body>
+</html>

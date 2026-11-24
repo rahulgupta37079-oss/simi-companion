@@ -113,6 +113,14 @@ def test_ai_fallback_replies():
     assert "main hoon" in reply.lower()
 
 
+def test_3d_glb_model_valid():
+    glb = BASE_DIR / "models" / "simi_3d_model.glb"
+    assert glb.exists()
+    data = glb.read_bytes()
+    assert data[:4] == b"glTF"
+    assert len(data) > 50_000
+
+
 def test_floating_companion_walk_run_lipsync():
     app = FloatingSimiApp()
     try:

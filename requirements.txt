@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+mss
+pillow
+pystray
+psutil
+pyttsx3
+edge-tts
+httpx
+opencv-python
+python-multipart
+pytest

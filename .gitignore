@@ -1,0 +1,21 @@
+# Private user data, API keys, chat memory & local screenshots (NEVER commit!)
+data/
+*.db
+*.sqlite
+*.sqlite3
+.env
+.env.*
+
+# Python & test artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+*.log
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

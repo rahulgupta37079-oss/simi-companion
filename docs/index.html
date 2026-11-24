@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simi Companion — Open-Source Autonomous Floating Desktop Buddy</title>
+  <meta name="description" content="Open-source autonomous animated desktop companion for Windows 10/11 with 108 expressions, animated walking & running, lip-sync mouth, clock-aware routines, and easy customization to create your own." />
+  <style>
+    :root {
+      --bg: #0c0e14;
+      --surface: #151924;
+      --surface-2: #1c2231;
+      --border: #2a3247;
+      --text: #f3f5fa;
+      --muted: #9aa4bc;
+      --amber: #f59e0b;
+      --pink: #f472b6;
+      --green: #22c55e;
+      --blue: #38bdf8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 18% 10%, rgba(244, 114, 182, 0.14), transparent 36%),
+                  radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.12), transparent 38%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--amber); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1120px; margin: 0 auto; padding: 0 22px; }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 19px;
+      color: #fff;
+    }
+    .logo img { width: 34px; height: 34px; object-fit: contain; border-radius: 50%; background: rgba(244,114,182,0.18); padding: 2px; }
+    .nav-links { display: flex; gap: 18px; align-items: center; font-size: 14px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+    .btn:hover { transform: translateY(-1px); text-decoration: none; }
+    .btn-primary { background: linear-gradient(135deg, var(--amber), var(--pink)); color: #111827; }
+    .btn-ghost { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+
+    .hero {
+      display: grid;
+      grid-template-columns: 1.15fr 0.95fr;
+      gap: 32px;
+      align-items: center;
+      padding: 58px 0 44px;
+    }
+    @media (max-width: 880px) { .hero { grid-template-columns: 1fr; } }
+    .badge {
+      display: inline-block;
+      padding: 5px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #fbcfe8;
+      background: rgba(244, 114, 182, 0.15);
+      border: 1px solid rgba(244, 114, 182, 0.35);
+      margin-bottom: 14px;
+    }
+    h1 {
+      font-size: clamp(32px, 4.4vw, 50px);
+      line-height: 1.12;
+      margin: 0 0 16px;
+      letter-spacing: -0.02em;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #fde68a, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .lead { font-size: 16px; color: var(--muted); margin: 0 0 24px; }
+    .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+    /* Interactive Live Desktop Stage */
+    .stage-card {
+      background: linear-gradient(180deg, #161b2a, #10141f);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: 0 20px 55px rgba(0, 0, 0, 0.45);
+    }
+    .stage {
+      position: relative;
+      height: 290px;
+      border-radius: 12px;
+      background: radial-gradient(circle at 50% 80%, rgba(244,114,182,0.12), transparent 65%), #0b0e16;
+      border: 1px solid rgba(255,255,255,0.06);
+      overflow: hidden;
+    }
+    .stage-taskbar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 26px;
+      background: rgba(255,255,255,0.06);
+      border-top: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .simi-actor {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: left 1.1s ease-in-out;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .speech-bubble {
+      background: #fff7f3;
+      color: #1f2937;
+      border: 2px solid var(--pink);
+      border-radius: 12px;
+      padding: 7px 11px;
+      font-size: 12px;
+      font-weight: 600;
+      max-width: 240px;
+      text-align: center;
+      margin-bottom: 6px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    .simi-sprite-wrap {
+      position: relative;
+      animation: bob 2.2s ease-in-out infinite;
+    }
+    .simi-sprite-wrap.running { animation: hop 0.28s ease-in-out infinite; }
+    .simi-sprite-wrap.walking { animation: hop 0.42s ease-in-out infinite; }
+    .simi-sprite { height: 155px; width: auto; user-select: none; }
+    .simi-sprite.flip { transform: scaleX(-1); }
+    .emote-badge {
+      position: absolute;
+      top: 0;
+      right: -14px;
+      font-size: 20px;
+      animation: bob 1.4s ease-in-out infinite;
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
+    }
+    @keyframes hop {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    .stage-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 12px;
+      justify-content: center;
+    }
+    .chip {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .chip:hover { border-color: var(--pink); color: #fbcfe8; }
+
+    section { padding: 44px 0; }
+    h2 { font-size: 28px; margin: 0 0 10px; }
+    .section-sub { color: var(--muted); margin: 0 0 26px; }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 860px) { .grid-3 { grid-template-columns: 1fr; } }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .card h3 { margin: 0 0 8px; font-size: 17px; }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .sprite-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      margin-top: 18px;
+    }
+    .sprite-tile {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      width: 128px;
+      text-align: center;
+    }
+    .sprite-tile img { height: 105px; object-fit: contain; }
+    .sprite-tile span { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+    /* Create Your Own Builder */
+    .builder {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+    @media (max-width: 860px) { .builder { grid-template-columns: 1fr; } }
+    .field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .field label { font-size: 12px; color: var(--muted); font-weight: 600; }
+    .field input, .field select {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 9px;
+      font-size: 14px;
+      outline: none;
+    }
+    .field input:focus, .field select:focus { border-color: var(--amber); }
+    pre {
+      background: #0a0d14;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      overflow-x: auto;
+      font-size: 12.5px;
+      color: #e2e8f0;
+      margin: 0;
+    }
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 26px 0 40px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <div class="logo">
+        <img src="assets/simi_idle.png" alt="Simi" />
+        <span>Simi Companion</span>
+      </div>
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#sprites">108 Expressions</a>
+        <a href="#create">Create Your Own</a>
+        <a class="btn btn-primary" href="https://github.com/rahulgupta37079-oss/simi-companion" target="_blank">GitHub Repo</a>
+      </div>
+    </nav>
+
+    <section class="hero">
+      <div>
+        <span class="badge">Open Source • MIT License • Windows 10/11</span>
+        <h1>A Human-Like <span class="gradient-text">Floating Companion</span> Living Right on Your Screen</h1>
+        <p class="lead">
+          No ugly browser dashboards. Meet <strong>Simi</strong>—an autonomous animated buddy who walks and runs along your taskbar, speaks with an animated lip-sync mouth, watches out for distractions, remembers your meals &amp; plans from natural chat, and cares for your well-being 24/7.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="#create">Create Your Own Companion</a>
+          <a class="btn btn-ghost" href="https://github.com/rahulgupta37079-oss/simi-companion" target="_blank">Star &amp; Fork on GitHub</a>
+        </div>
+      </div>
+
+      <div class="stage-card">
+        <div class="stage" id="demoStage">
+          <div class="simi-actor" id="simiActor">
+            <div class="speech-bubble" id="simiBubble">Hiii! Click any mood below to see me walk, run, and react!</div>
+            <div class="simi-sprite-wrap" id="simiWrap">
+              <img class="simi-sprite" id="simiImg" src="assets/simi_idle.png" alt="Simi animated demo" />
+              <span class="emote-badge" id="simiEmote">✦</span>
+            </div>
+          </div>
+          <div class="stage-taskbar">
+            <span>Windows Desktop Preview</span>
+            <span id="stageClock">12:00 PM</span>
+          </div>
+        </div>
+        <div class="stage-controls">
+          <button class="chip" onclick="demoAction('walk')">Walk</button>
+          <button class="chip" onclick="demoAction('run')">Run Excitedly</button>
+          <button class="chip" onclick="demoAction('focus')">Catch Distraction</button>
+          <button class="chip" onclick="demoAction('care')">Comfort Hug</button>
+          <button class="chip" onclick="demoAction('laugh')">Celebrate Win</button>
+          <button class="chip" onclick="demoAction('sleepy')">Late Night Sleepy</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="features">
+      <h2>Built to Feel Alive, Not Like a Tool</h2>
+      <p class="section-sub">100% local SQLite memory, zero heavy downloads required, and fully customizable for anyone.</p>
+      <div class="grid-3">
+        <div class="card">
+          <h3>108 Expressions + Working Mouth</h3>
+          <p>Real-time lip-sync mouth animation while speaking, soft rosy cheek blush, floating emote badges, and 108 distinct emotional states.</p>
+        </div>
+        <div class="card">
+          <h3>Walks, Runs &amp; Floats on Her Own</h3>
+          <p>Strolls casually along your taskbar, runs over with sparkles when catching distractions or celebrating, and never blocks what you type.</p>
+        </div>
+        <div class="card">
+          <h3>24/7 Clock-Aware Routines</h3>
+          <p>Knows the exact time—morning hype, breakfast/lunch/dinner reminders, afternoon chai breaks, hydration nudges, and sleepy late-night care.</p>
+        </div>
+        <div class="card">
+          <h3>Screen &amp; Focus Guardian</h3>
+          <p>Tracks your active Windows app locally, saves optional local screenshots, and lovingly pulls you back if you drift onto Reels or YouTube.</p>
+        </div>
+        <div class="card">
+          <h3>Natural Human Chat Memory</h3>
+          <p>Just click her and talk naturally ("I ate poha and drank 2 glasses of water"). She logs meals, water, plans, and moods automatically.</p>
+        </div>
+        <div class="card">
+          <h3>Bring Your Own AI &amp; Voice</h3>
+          <p>Works with free Google Gemini, Groq, local Ollama, or offline Built-in mode, plus neural Indian English, Hindi, US, and UK voices.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="sprites">
+      <h2>10 Base Poses Powering 108 Expressions</h2>
+      <p class="section-sub">Fork the repo and drop your own character sprites into <code>custom_raw/</code> to build your own desktop partner.</p>
+      <div class="sprite-strip">
+        <div class="sprite-tile"><img src="assets/simi_idle.png" alt="Idle" /><span>Idle Wave</span></div>
+        <div class="sprite-tile"><img src="assets/simi_talk.png" alt="Talk" /><span>Lip-Sync Talk</span></div>
+        <div class="sprite-tile"><img src="assets/simi_walk_1.png" alt="Walk 1" /><span>Walk Stride 1</span></div>
+        <div class="sprite-tile"><img src="assets/simi_walk_2.png" alt="Walk 2" /><span>Walk Stride 2</span></div>
+        <div class="sprite-tile"><img src="assets/simi_run_1.png" alt="Run 1" /><span>Run Sprint 1</span></div>
+        <div class="sprite-tile"><img src="assets/simi_run_2.png" alt="Run 2" /><span>Run Sprint 2</span></div>
+        <div class="sprite-tile"><img src="assets/simi_focus.png" alt="Focus" /><span>Playful Scold</span></div>
+        <div class="sprite-tile"><img src="assets/simi_care.png" alt="Care" /><span>Comfort Hug</span></div>
+        <div class="sprite-tile"><img src="assets/simi_laugh.png" alt="Laugh" /><span>Celebrate Joy</span></div>
+        <div class="sprite-tile"><img src="assets/simi_sleepy.png" alt="Sleepy" /><span>Late-Night Sleepy</span></div>
+      </div>
+    </section>
+
+    <section id="create">
+      <h2>Create Your Own Companion in 60 Seconds</h2>
+      <p class="section-sub">Customize your companion below, download your local <code>data/config.json</code>, or run the interactive setup wizard.</p>
+      <div class="builder">
+        <div>
+          <div class="field">
+            <label>Companion Name</label>
+            <input id="bCompName" value="Simi" oninput="renderBuilder()" />
+          </div>
+          <div class="field">
+            <label>What Should They Call You?</label>
+            <input id="bUserName" value="Partner" oninput="renderBuilder()" />
+          </div>
+          <div class="field">
+            <label>Voice Accent (edge-tts Neural Voice)</label>
+            <select id="bVoice" onchange="renderBuilder()">
+              <option value="en-IN-NeerjaNeural">Indian English — Female (Neerja)</option>
+              <option value="hi-IN-SwaraNeural">Hindi — Female (Swara)</option>
+              <option value="en-US-JennyNeural">US English — Female (Jenny)</option>
+              <option value="en-GB-SoniaNeural">British English — Female (Sonia)</option>
+              <option value="en-IN-PrabhatNeural">Indian English — Male (Prabhat)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>AI Brain Provider</label>
+            <select id="bProvider" onchange="renderBuilder()">
+              <option value="gemini">Google Gemini (Free API, 0 MB download)</option>
+              <option value="groq">Groq Llama 3.3 70B (Free API, ultra-fast)</option>
+              <option value="ollama">Local Ollama (100% Offline)</option>
+              <option value="builtin">Built-in Offline Mode (No key needed)</option>
+            </select>
+          </div>
+          <div class="cta-row" style="margin-top:14px;">
+            <button class="btn btn-primary" onclick="downloadConfig()">Download config.json</button>
+            <button class="btn btn-ghost" onclick="copyInstall()">Copy Quick-Start Commands</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;">1. Clone &amp; Launch (Windows PowerShell)</div>
+            <pre id="installCmd">git clone https://github.com/rahulgupta37079-oss/simi-companion.git
+cd simi-companion
+pip install -r requirements.txt
+python create_your_own.py
+python run_simi.py</pre>
+          </div>
+          <div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:6px;font-weight:600;">2. Generated Preview (<code>data/config.json</code>)</div>
+            <pre id="configPreview"></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      Built with love as an open-source project by <a href="https://github.com/rahulgupta37079-oss" target="_blank">rahulgupta37079-oss</a> • Licensed under MIT • Create your own companion and share it with the community!
+    </footer>
+  </div>
+
+  <script>
+    let animTimer = null;
+    let currentX = 50;
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('stageClock').textContent = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    }
+    updateClock();
+    setInterval(updateClock, 15000);
+
+    function demoAction(kind) {
+      if (animTimer) { clearInterval(animTimer); animTimer = null; }
+      const actor = document.getElementById('simiActor');
+      const wrap = document.getElementById('simiWrap');
+      const img = document.getElementById('simiImg');
+      const bubble = document.getElementById('simiBubble');
+      const emote = document.getElementById('simiEmote');
+
+      wrap.className = 'simi-sprite-wrap';
+      img.classList.remove('flip');
+
+      if (kind === 'walk') {
+        const nextX = currentX > 50 ? 24 : 76;
+        if (nextX < currentX) img.classList.add('flip');
+        currentX = nextX;
+        actor.style.left = nextX + '%';
+        wrap.classList.add('walking');
+        bubble.textContent = 'Just strolling along your taskbar to keep you company!';
+        emote.textContent = '♪';
+        let f = 0;
+        animTimer = setInterval(() => {
+          img.src = (f++ % 2 === 0) ? 'assets/simi_walk_1.png' : 'assets/simi_walk_2.png';
+        }, 190);
+        setTimeout(() => { clearInterval(animTimer); wrap.className = 'simi-sprite-wrap'; img.src = 'assets/simi_idle.png'; }, 1200);
+      } else if (kind === 'run') {
+        const nextX = currentX > 50 ? 20 : 80;
+        if (nextX < currentX) img.classList.add('flip');
+        currentX = nextX;
+        actor.style.left = nextX + '%';
+        wrap.classList.add('running');
+        bubble.textContent = 'Chalo chalo! Running over to hype you up!';
+        emote.textContent = '✦✧';
+        let f = 0;
+        animTimer = setInterval(() => {
+          img.src = (f++ % 2 === 0) ? 'assets/simi_run_1.png' : 'assets/simi_run_2.png';
+        }, 115);
+        setTimeout(() => { clearInterval(animTimer); wrap.className = 'simi-sprite-wrap'; img.src = 'assets/simi_laugh.png'; }, 1150);
+      } else if (kind === 'focus') {
+        img.src = 'assets/simi_focus.png';
+        bubble.textContent = 'Arey! Pakde gaye — Reels band karo aur wapas apne plan pe aao!';
+        emote.textContent = '💢';
+      } else if (kind === 'care') {
+        img.src = 'assets/simi_care.png';
+        bubble.textContent = 'Koi baat nahi, main hoon na yahan. Paani piyo aur mujhse baat karo.';
+        emote.textContent = '♥ ♥';
+      } else if (kind === 'laugh') {
+        img.src = 'assets/simi_laugh.png';
+        bubble.textContent = 'Shabash!! Ek aur goal complete — so proud of you!';
+        emote.textContent = '🏆';
+      } else if (kind === 'sleepy') {
+        img.src = 'assets/simi_sleepy.png';
+        bubble.textContent = 'Dekho kitni raat ho gayi... aankhein rest karo aur jaldi so jao please.';
+        emote.textContent = 'Zzz';
+      }
+    }
+
+    function getBuilderConfig() {
+      return {
+        assistant_name: document.getElementById('bCompName').value.trim() || 'Simi',
+        user_name: document.getElementById('bUserName').value.trim() || 'Partner',
+        voice_name: document.getElementById('bVoice').value,
+        voice_enabled: true,
+        ai_provider: document.getElementById('bProvider').value,
+        gemini_model: 'gemini-flash-lite-latest',
+        screen_monitor_enabled: true,
+        checkin_interval_min: 45
+      };
+    }
+
+    function renderBuilder() {
+      document.getElementById('configPreview').textContent = JSON.stringify(getBuilderConfig(), null, 2);
+    }
+
+    function downloadConfig() {
+      const blob = new Blob([JSON.stringify(getBuilderConfig(), null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'config.json';
+      a.click();
+    }
+
+    function copyInstall() {
+      navigator.clipboard.writeText(document.getElementById('installCmd').textContent);
+      alert('Copied quick-start commands!');
+    }
+
+    renderBuilder();
+  </script>
+</body>
+</html>

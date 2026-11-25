@@ -33,6 +33,9 @@ def main() -> None:
         def on_talk(_icon, _item):
             companion.root.after(0, companion.open_chat_popup)
 
+        def on_listen(_icon, _item):
+            companion.root.after(0, companion.trigger_listen_once)
+
         def on_comfort(_icon, _item):
             companion.root.after(0, companion._trigger_comfort)
 
@@ -56,7 +59,8 @@ def main() -> None:
             companion.root.after(0, companion.quit)
 
         menu = pystray.Menu(
-            pystray.MenuItem("Talk to Simi", on_talk, default=True),
+            pystray.MenuItem("Listen to Me Now (Mic)", on_listen, default=True),
+            pystray.MenuItem("Talk to Simi (Type)", on_talk),
             pystray.MenuItem("Show / Hide (Meeting Pause)", on_meeting),
             pystray.MenuItem("Toggle Interview & Study Prep", on_prep),
             pystray.MenuItem("I'm Feeling Low / Comfort", on_comfort),

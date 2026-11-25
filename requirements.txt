@@ -9,4 +9,6 @@ edge-tts
 httpx
 opencv-python
 python-multipart
+sounddevice
+numpy
 pytest

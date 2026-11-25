@@ -35,6 +35,7 @@ from app.screen_monitor import (
 )
 from app.time_routines import routine_engine
 from app.voice import voice_engine
+from app.voice_listener import record_utterance, transcribe_audio_sync
 
 logger = logging.getLogger("simi.companion")
 
@@ -233,6 +234,13 @@ class FloatingSimiApp:
         )
         self._brain_thread.start()
 
+        self._is_listening_once = False
+        self._last_voice_chat_at = 0.0
+        self._mic_thread = threading.Thread(
+            target=self._hands_free_mic_loop, daemon=True, name="SimiMic"
+        )
+        self._mic_thread.start()
+
         self._schedule_startup_greeting()
         self._update_geometry()
         self.root.after(33, self._tick)
@@ -379,7 +387,12 @@ class FloatingSimiApp:
     def _on_right_click(self, event: tk.Event) -> None:
         cfg = load_config()
         menu = tk.Menu(self.root, tearoff=0)
-        menu.add_command(label="Talk to Simi", command=self.open_chat_popup)
+        menu.add_command(label="Talk to Simi (Type)", command=self.open_chat_popup)
+        menu.add_command(label="Listen to Me Now (Mic)", command=self.trigger_listen_once)
+        menu.add_command(
+            label=f"Hands-Free 'Simi' Mic: {'ON' if cfg.hands_free_listening else 'OFF'}",
+            command=lambda: self._toggle_cfg("hands_free_listening"),
+        )
         menu.add_command(label="I'm feeling low / need comfort", command=self._trigger_comfort)
         menu.add_command(label="Morning Check-in", command=self._trigger_morning)
         menu.add_separator()
@@ -571,6 +584,18 @@ class FloatingSimiApp:
 
         tk.Button(
             frame,
+            text="Mic",
+            command=lambda: (win.destroy(), self.trigger_listen_once()),
+            bg="#ec4899",
+            fg="#ffffff",
+            relief="flat",
+            font=("Segoe UI", 9, "bold"),
+            padx=8,
+            pady=3,
+        ).pack(side="left", padx=(0, 4))
+
+        tk.Button(
+            frame,
             text="Send",
             command=submit,
             bg="#f59e0b",
@@ -608,6 +633,115 @@ class FloatingSimiApp:
 
         self.chat_win = win
         self.chat_entry = entry
+
+    def trigger_listen_once(self) -> None:
+        """Push-to-talk: listen to the user's microphone once and respond naturally."""
+        if self._is_listening_once or self.meeting_paused:
+            return
+        self._is_listening_once = True
+        self.show_bubble("Haan bolo na, sun rahi hoon... (Listening)", expr_name="listening_intently", duration_sec=10.0, animate_mouth=False)
+
+        def _work():
+            try:
+                cfg = load_config()
+                wav = record_utterance(
+                    max_duration_sec=12.0,
+                    start_timeout_sec=7.0,
+                    silence_stop_sec=1.25,
+                    device_index=cfg.mic_device_index,
+                    abort_check=lambda: self._stop_event.is_set() or self.meeting_paused,
+                )
+                if not wav:
+                    self.events.put(
+                        CompanionEvent("speak", text="Arey mujhe aawaz nahi aayi — phir se bolo na!", expression="curious_tilt", duration_sec=4.5)
+                    )
+                    return
+                text, vocal_mood = transcribe_audio_sync(wav, cfg)
+                if not text:
+                    self.events.put(
+                        CompanionEvent("speak", text="Sorry, clear sunai nahi diya — ek baar aur bolo na!", expression="curious_tilt", duration_sec=4.5)
+                    )
+                    return
+                self._last_voice_chat_at = time.time()
+                self._respond_to_heard_speech(text, vocal_mood)
+            finally:
+                self._is_listening_once = False
+
+        threading.Thread(target=_work, daemon=True, name="SimiListenOnce").start()
+
+    def _respond_to_heard_speech(self, user_text: str, vocal_mood: str = "neutral") -> None:
+        cfg = load_config()
+        recorded = natural_memory.capture_from_chat(user_text)
+        if vocal_mood in {"crying", "sad"} and "mood" not in recorded:
+            db.add_checkin("Crying" if vocal_mood == "crying" else "Stressed", energy=2, note=f"Voice tone: {vocal_mood}", source="voice")
+            recorded["mood"] = "crying" if vocal_mood == "crying" else "distressed"
+
+        db.add_message("user", user_text, event_type="voice_chat")
+        summary = db.get_daily_summary()
+        history = db.get_recent_messages(18)
+
+        prompt_text = user_text
+        if vocal_mood in {"crying", "sad", "tired", "stressed"}:
+            prompt_text = f"{user_text} [Note: their voice sounded {vocal_mood}]"
+
+        reply = asyncio.run(ai_engine.generate_chat_reply(prompt_text, history, cfg, summary))
+        db.add_message("assistant", reply, event_type="voice_chat")
+
+        expr = pick_expression_for_context(
+            text=reply + " " + user_text,
+            event_type="emotional_support" if vocal_mood in {"crying", "sad"} else "chat",
+            hour=datetime.now().hour,
+            mood=str(recorded.get("mood", "")),
+        )
+        dur = max(6.0, min(15.0, len(reply) * 0.065))
+        if vocal_mood in {"crying", "sad"}:
+            self.events.put(CompanionEvent("move", expression=expr.name, move_mode="run"))
+        self.events.put(CompanionEvent("speak", text=reply, expression=expr.name, duration_sec=dur))
+        voice_engine.speak(reply)
+
+    def _hands_free_mic_loop(self) -> None:
+        """Background hands-free listener: wakes when you say 'Simi' or continue a voice conversation."""
+        time.sleep(3.5)
+        while not self._stop_event.is_set():
+            cfg = load_config()
+            if (
+                not cfg.hands_free_listening
+                or self.meeting_paused
+                or self._is_listening_once
+                or voice_engine.is_speaking
+                or not cfg.gemini_api_key.strip()
+            ):
+                time.sleep(0.8)
+                continue
+
+            wav = record_utterance(
+                max_duration_sec=9.0,
+                start_timeout_sec=4.0,
+                silence_stop_sec=1.1,
+                device_index=cfg.mic_device_index,
+                abort_check=lambda: (
+                    self._stop_event.is_set()
+                    or self.meeting_paused
+                    or self._is_listening_once
+                    or voice_engine.is_speaking
+                    or not load_config().hands_free_listening
+                ),
+            )
+            if not wav:
+                continue
+
+            text, vocal_mood = transcribe_audio_sync(wav, cfg)
+            if not text:
+                continue
+
+            low = text.lower()
+            wake_words = (cfg.assistant_name.lower(), "simi", "seemi", "suno", "hey simi")
+            in_active_convo = (time.time() - self._last_voice_chat_at) < 35.0
+            if any(w in low for w in wake_words) or in_active_convo or vocal_mood == "crying":
+                self._last_voice_chat_at = time.time()
+                self._respond_to_heard_speech(text, vocal_mood)
+                # Brief cooldown after Simi starts replying so we don't hear her own voice
+                time.sleep(1.5)
 
     def _handle_user_chat(self, user_text: str) -> None:
         self.show_bubble("Hmm, sun rahi hoon...", expr_name="listening_intently", duration_sec=6.0, animate_mouth=False)

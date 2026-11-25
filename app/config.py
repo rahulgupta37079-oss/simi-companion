@@ -23,6 +23,8 @@ class SimiConfig:
     voice_rate: str = "+0%"
     voice_pitch: str = "+1Hz"
     voice_enabled: bool = True
+    hands_free_listening: bool = False
+    mic_device_index: int = -1
     interview_prep_mode: bool = False
 
     # AI provider: "auto", "gemini", "groq", "openai_compat", "ollama", "builtin"

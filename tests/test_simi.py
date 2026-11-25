@@ -18,6 +18,7 @@ from app.expression_engine import (
 from app.floating_companion import FloatingSimiApp
 from app.screen_monitor import classify_window
 from app.time_routines import TimeRoutineEngine
+from app.voice_listener import _pcm_to_wav_bytes, list_microphones
 
 
 def test_all_10_sprites_exist_and_transparent():
@@ -119,6 +120,15 @@ def test_3d_glb_model_valid():
     data = glb.read_bytes()
     assert data[:4] == b"glTF"
     assert len(data) > 50_000
+
+
+def test_voice_listener_wav_encoding():
+    import numpy as np
+
+    wav = _pcm_to_wav_bytes(np.zeros(1600, dtype=np.int16))
+    assert wav[:4] == b"RIFF"
+    assert b"WAVE" in wav[:16]
+    assert isinstance(list_microphones(), list)
 
 
 def test_floating_companion_walk_run_lipsync():

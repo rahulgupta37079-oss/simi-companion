@@ -181,13 +181,12 @@
 <body>
   <div class="hud-top">
     <div class="brand">
-      <h1>Simi — 3D Character Studio</h1>
-      <p id="modeSubtitle">Cute Cartoon AI • Move Mouse for 3D Depth • Live Animations</p>
+      <h1>Simi — Character Studio</h1>
+      <p id="modeSubtitle">Cute Anime Character • Move Mouse for 3D Depth • Live Animations</p>
     </div>
     <div class="actions">
       <a class="btn" href="index.html">← Home</a>
-      <button class="btn" id="modeCartoonBtn" onclick="window.setStudioMode('cartoon')" style="border-color:var(--pink);color:#fde68a;">Cute Cartoon</button>
-      <button class="btn" id="modeRealisticBtn" onclick="window.setStudioMode('realistic')">Realistic CGI</button>
+      <button class="btn" id="modeCartoonBtn" onclick="window.setStudioMode('cartoon')" style="border-color:var(--pink);color:#fde68a;">Anime Character</button>
       <button class="btn" id="modeMeshBtn" onclick="window.setStudioMode('mesh')">3D Mesh (.GLB)</button>
       <button class="btn btn-primary" onclick="window.downloadGLB()">Download .GLB</button>
     </div>
@@ -1163,7 +1162,7 @@
     });
 
     function spriteBase() {
-      return studioMode === 'realistic' ? 'assets/realistic/' : 'assets/';
+      return 'assets/';
     }
 
     function updateCgiAnimation(name) {
@@ -1206,7 +1205,6 @@
       studioMode = mode;
       const btns = {
         cartoon: document.getElementById('modeCartoonBtn'),
-        realistic: document.getElementById('modeRealisticBtn'),
         mesh: document.getElementById('modeMeshBtn'),
       };
       Object.entries(btns).forEach(([k, el]) => {
@@ -1220,9 +1218,7 @@
       } else {
         cgiStage.classList.remove('hidden');
         canvas.style.display = 'none';
-        modeSubtitle.textContent = mode === 'realistic'
-          ? 'Realistic 3D CGI • Move Mouse for 3D Depth • Live Animations'
-          : 'Cute Cartoon AI • Move Mouse for 3D Depth • Live Animations';
+        modeSubtitle.textContent = 'Cute Anime Character • Move Mouse for 3D Depth • Live Animations';
         updateCgiAnimation(currentAnim);
       }
     };

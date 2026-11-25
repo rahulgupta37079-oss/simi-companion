@@ -181,13 +181,15 @@
 <body>
   <div class="hud-top">
     <div class="brand">
-      <h1>Simi — Realistic 3D CGI Studio</h1>
-      <p id="modeSubtitle">High-Graphic Realistic 3D CGI • Move Mouse for 3D Depth • Live Animations</p>
+      <h1>Simi — 3D Character Studio</h1>
+      <p id="modeSubtitle">Cute Cartoon AI • Move Mouse for 3D Depth • Live Animations</p>
     </div>
     <div class="actions">
       <a class="btn" href="index.html">← Home</a>
-      <button class="btn" id="modeToggleBtn" onclick="window.toggleStudioMode()">Switch to 3D Mesh (.GLB Orbit)</button>
-      <button class="btn btn-primary" onclick="window.downloadGLB()">Download .GLB Model</button>
+      <button class="btn" id="modeCartoonBtn" onclick="window.setStudioMode('cartoon')" style="border-color:var(--pink);color:#fde68a;">Cute Cartoon</button>
+      <button class="btn" id="modeRealisticBtn" onclick="window.setStudioMode('realistic')">Realistic CGI</button>
+      <button class="btn" id="modeMeshBtn" onclick="window.setStudioMode('mesh')">3D Mesh (.GLB)</button>
+      <button class="btn btn-primary" onclick="window.downloadGLB()">Download .GLB</button>
     </div>
   </div>
 
@@ -1145,24 +1147,28 @@
       sleepy: 'Dekho kitni raat ho gayi... aankhein rest karo aur jaldi so jao please.',
     };
 
-    let studioMode = 'cgi'; // 'cgi' (default realistic high-graphic) or 'mesh' (360° GLB orbit)
+    let studioMode = 'cartoon'; // 'cartoon' (default), 'realistic', or 'mesh' (360° GLB orbit)
     let cgiTimer = null;
     const cgiStage = document.getElementById('cgiStage');
     const cgiRig = document.getElementById('cgiRig');
     const cgiImg = document.getElementById('cgiImg');
     const cgiEmote = document.getElementById('cgiEmote');
-    const modeToggleBtn = document.getElementById('modeToggleBtn');
     const modeSubtitle = document.getElementById('modeSubtitle');
 
     document.addEventListener('mousemove', (e) => {
-      if (studioMode !== 'cgi') return;
+      if (studioMode === 'mesh') return;
       const nx = (e.clientX / window.innerWidth - 0.5) * 2;
       const ny = (e.clientY / window.innerHeight - 0.5) * 2;
       cgiRig.style.transform = `rotateY(${nx * 14}deg) rotateX(${-ny * 8}deg)`;
     });
 
+    function spriteBase() {
+      return studioMode === 'realistic' ? 'assets/realistic/' : 'assets/';
+    }
+
     function updateCgiAnimation(name) {
       if (cgiTimer) { clearInterval(cgiTimer); cgiTimer = null; }
+      const base = spriteBase();
       cgiImg.className = 'cgi-char';
       const emotes = {
         idle: '✦', walk: '♪', run: '🔥', talk: '💬',
@@ -1172,42 +1178,52 @@
       if (name === 'walk') {
         cgiImg.classList.add('walk-hop');
         let f = 0;
-        cgiImg.src = 'assets/simi_walk_1.png';
+        cgiImg.src = `${base}simi_walk_1.png`;
         cgiTimer = setInterval(() => {
-          cgiImg.src = (f++ % 2 === 0) ? 'assets/simi_walk_2.png' : 'assets/simi_walk_1.png';
+          cgiImg.src = (f++ % 2 === 0) ? `${base}simi_walk_2.png` : `${base}simi_walk_1.png`;
         }, 210);
       } else if (name === 'run') {
         cgiImg.classList.add('run-hop');
         let f = 0;
-        cgiImg.src = 'assets/simi_run_1.png';
+        cgiImg.src = `${base}simi_run_1.png`;
         cgiTimer = setInterval(() => {
-          cgiImg.src = (f++ % 2 === 0) ? 'assets/simi_run_2.png' : 'assets/simi_run_1.png';
+          cgiImg.src = (f++ % 2 === 0) ? `${base}simi_run_2.png` : `${base}simi_run_1.png`;
         }, 140);
       } else if (name === 'talk') {
         cgiImg.classList.add('talk-nod');
         let f = 0;
-        cgiImg.src = 'assets/simi_talk.png';
+        cgiImg.src = `${base}simi_talk.png`;
         cgiTimer = setInterval(() => {
-          cgiImg.src = (f++ % 2 === 0) ? 'assets/simi_idle.png' : 'assets/simi_talk.png';
+          cgiImg.src = (f++ % 2 === 0) ? `${base}simi_idle.png` : `${base}simi_talk.png`;
         }, 240);
       } else {
         cgiImg.classList.add('bob');
-        cgiImg.src = `assets/simi_${name === 'laugh' ? 'laugh' : name}.png`;
+        cgiImg.src = `${base}simi_${name === 'laugh' ? 'laugh' : name}.png`;
       }
     }
 
-    window.toggleStudioMode = () => {
-      studioMode = (studioMode === 'cgi') ? 'mesh' : 'cgi';
-      if (studioMode === 'cgi') {
-        cgiStage.classList.remove('hidden');
-        canvas.style.display = 'none';
-        modeToggleBtn.textContent = 'Switch to 3D Mesh (.GLB Orbit)';
-        modeSubtitle.textContent = 'High-Graphic Realistic 3D CGI • Move Mouse for 3D Depth • Live Animations';
-      } else {
+    window.setStudioMode = (mode) => {
+      studioMode = mode;
+      const btns = {
+        cartoon: document.getElementById('modeCartoonBtn'),
+        realistic: document.getElementById('modeRealisticBtn'),
+        mesh: document.getElementById('modeMeshBtn'),
+      };
+      Object.entries(btns).forEach(([k, el]) => {
+        el.style.borderColor = (k === mode) ? 'var(--pink)' : 'var(--border)';
+        el.style.color = (k === mode) ? '#fde68a' : 'var(--text)';
+      });
+      if (mode === 'mesh') {
         cgiStage.classList.add('hidden');
         canvas.style.display = 'block';
-        modeToggleBtn.textContent = 'Switch to Realistic 3D CGI';
         modeSubtitle.textContent = 'Real-Time 360° 3D Mesh • Drag to Orbit • Scroll to Zoom';
+      } else {
+        cgiStage.classList.remove('hidden');
+        canvas.style.display = 'none';
+        modeSubtitle.textContent = mode === 'realistic'
+          ? 'Realistic 3D CGI • Move Mouse for 3D Depth • Live Animations'
+          : 'Cute Cartoon AI • Move Mouse for 3D Depth • Live Animations';
+        updateCgiAnimation(currentAnim);
       }
     };
 
@@ -1215,9 +1231,9 @@
       currentAnim = name;
       bubbleEl.textContent = animLines[name] || '';
       document.querySelectorAll('#animRow .chip').forEach(b => b.classList.toggle('active', b.dataset.anim === name));
-      updateCgiAnimation(name);
+      if (studioMode !== 'mesh') updateCgiAnimation(name);
     };
-    updateCgiAnimation('idle');
+    window.setStudioMode('cartoon');
 
     window.setOutfit = (style) => {
       const t = makeKurtiTextures(style);

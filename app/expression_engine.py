@@ -210,24 +210,24 @@ def pick_expression_for_context(
 
 
 def _detect_mouth_anchor(img: Image.Image) -> Tuple[int, int, Tuple[int, int, int]]:
-    """Locate exact (cx, cy, skin_rgb) of the mouth strictly below the glasses and above the chin."""
+    """Locate exact (cx, cy, skin_rgb) of the mouth for realistic ~6.5-head human proportions."""
     w, h = img.size
     px = img.load()
 
-    # Step 1: Find the horizontal center of her face (skin pixels in the cheek/mouth band y=0.33..0.41)
-    y0, y1 = int(h * 0.33), int(h * 0.42)
+    # In realistic full-body proportions, face sits in top y=0.05..0.145
+    y0, y1 = int(h * 0.085), int(h * 0.145)
     skin_xs = []
     skin_rgbs = []
     for y in range(y0, y1):
-        for x in range(int(w * 0.15), int(w * 0.85)):
+        for x in range(int(w * 0.25), int(w * 0.75)):
             r, g, b, a = px[x, y]
             if a < 220:
                 continue
-            if 150 <= r <= 235 and 95 <= g <= 185 and 60 <= b <= 145 and (r - b) > 35:
+            if 130 <= r <= 235 and 80 <= g <= 185 and 50 <= b <= 145 and (r - b) > 25:
                 skin_xs.append(x)
                 skin_rgbs.append((r, g, b))
 
-    face_cx = (sum(skin_xs) // len(skin_xs)) if skin_xs else int(w * 0.52)
+    face_cx = (sum(skin_xs) // len(skin_xs)) if skin_xs else int(w * 0.50)
     if skin_rgbs:
         skin_rgb = (
             sum(c[0] for c in skin_rgbs) // len(skin_rgbs),
@@ -235,86 +235,44 @@ def _detect_mouth_anchor(img: Image.Image) -> Tuple[int, int, Tuple[int, int, in
             sum(c[2] for c in skin_rgbs) // len(skin_rgbs),
         )
     else:
-        skin_rgb = (205, 146, 108)
+        skin_rgb = (195, 138, 102)
 
-    # Step 2: Within ±18px of face_cx and y=0.34..0.415, locate teeth/open-mouth/lip pixels
-    mx0 = max(0, face_cx - 18)
-    mx1 = min(w, face_cx + 18)
-    my0 = int(h * 0.34)
-    my1 = int(h * 0.415)
-    mouth_pts = []
-    for y in range(my0, my1):
-        for x in range(mx0, mx1):
-            r, g, b, a = px[x, y]
-            if a < 220:
-                continue
-            is_teeth = r > 215 and g > 205 and b > 205
-            is_lip_interior = r > 150 and g < 115 and b < 115 and (r - g) > 45
-            is_mouth_line = r < 110 and g < 70 and b < 60
-            if is_teeth or is_lip_interior or is_mouth_line:
-                mouth_pts.append((x, y))
-
-    if len(mouth_pts) >= 4:
-        cx = sum(p[0] for p in mouth_pts) // len(mouth_pts)
-        cy = sum(p[1] for p in mouth_pts) // len(mouth_pts)
-        return cx, cy, skin_rgb
-    return face_cx, int(h * 0.37), skin_rgb
+    return face_cx, int(h * 0.116), skin_rgb
 
 
 def bake_mouth_frame(base_img: Image.Image, mouth_state: str, blush: float = 0.0) -> Image.Image:
-    """Create a crisp animated mouth frame ('closed', 'small', 'mid', 'wide', 'o', 'pout', 'yawn') + soft blush."""
-    if mouth_state == "default" and blush <= 0.05:
+    """Apply ultra-subtle realistic lip-sync micro-motion & soft cheek glow without cartoon overlays."""
+    if mouth_state == "default" and blush <= 0.15:
         return base_img.copy()
 
     img = base_img.copy()
-    cx, cy, skin = _detect_mouth_anchor(img)
+    w, h = img.size
+    cx, cy, _ = _detect_mouth_anchor(img)
 
-    # Soft alpha-composited rosy cheek blush (masked to character silhouette so it never spills!)
-    if blush > 0.15:
+    # Very subtle soft rosy warmth on cheeks for high-blush moods
+    if blush > 0.35:
         overlay = Image.new("RGBA", img.size, (0, 0, 0, 0))
         odraw = ImageDraw.Draw(overlay)
-        alpha = int(min(72, blush * 68))
-        for dx in (-17, 17):
-            odraw.ellipse((cx + dx - 7, cy - 9, cx + dx + 7, cy - 2), fill=(255, 105, 140, alpha))
-        # Clip blush strictly to opaque character pixels
+        alpha = int(min(38, blush * 36))
+        r_chk = max(3, int(h * 0.014))
+        dx_chk = max(5, int(h * 0.025))
+        for dx in (-dx_chk, dx_chk):
+            odraw.ellipse((cx + dx - r_chk, cy - r_chk - 2, cx + dx + r_chk, cy + 1), fill=(255, 110, 140, alpha))
         opx = overlay.load()
         bpx = base_img.load()
-        for y in range(max(0, cy - 12), min(img.height, cy + 2)):
-            for x in range(max(0, cx - 28), min(img.width, cx + 28)):
+        for y in range(max(0, cy - r_chk - 4), min(h, cy + 4)):
+            for x in range(max(0, cx - dx_chk - r_chk - 2), min(w, cx + dx_chk + r_chk + 2)):
                 if bpx[x, y][3] < 200:
                     opx[x, y] = (0, 0, 0, 0)
         img = Image.alpha_composite(img, overlay)
 
-    if mouth_state == "default":
-        return img
-
-    draw = ImageDraw.Draw(img, "RGBA")
-    # Cleanly patch over existing mouth with matched skin tone
-    draw.ellipse((cx - 12, cy - 6, cx + 13, cy + 7), fill=(skin[0], skin[1], skin[2], 255))
-
-    outline = (78, 36, 28, 255)
-    inner = (165, 62, 72, 255)
-    tongue = (232, 118, 128, 255)
-
-    if mouth_state == "closed":
-        draw.arc((cx - 7, cy - 4, cx + 7, cy + 4), start=15, end=165, fill=outline, width=2)
-    elif mouth_state == "small":
-        draw.ellipse((cx - 5, cy - 2, cx + 5, cy + 4), fill=inner, outline=outline, width=1)
-        draw.line((cx - 3, cy, cx + 3, cy), fill=(255, 255, 255, 255), width=1)
-    elif mouth_state == "mid":
-        draw.chord((cx - 7, cy - 3, cx + 7, cy + 6), start=0, end=180, fill=inner, outline=outline, width=2)
-        draw.ellipse((cx - 4, cy + 1, cx + 4, cy + 5), fill=tongue)
-        draw.line((cx - 5, cy + 1, cx + 5, cy + 1), fill=(255, 255, 255, 255), width=1)
-    elif mouth_state == "wide":
-        draw.chord((cx - 8, cy - 3, cx + 8, cy + 8), start=0, end=180, fill=inner, outline=outline, width=2)
-        draw.ellipse((cx - 4, cy + 2, cx + 4, cy + 7), fill=tongue)
-        draw.line((cx - 6, cy + 1, cx + 6, cy + 1), fill=(255, 255, 255, 255), width=1)
-    elif mouth_state == "o":
-        draw.ellipse((cx - 4, cy - 3, cx + 4, cy + 5), fill=inner, outline=outline, width=2)
-    elif mouth_state == "pout":
-        draw.arc((cx - 5, cy, cx + 5, cy + 6), start=200, end=340, fill=outline, width=2)
-    elif mouth_state == "yawn":
-        draw.ellipse((cx - 5, cy - 3, cx + 5, cy + 7), fill=inner, outline=outline, width=2)
-        draw.ellipse((cx - 3, cy + 2, cx + 3, cy + 6), fill=tongue)
+    # Subtle realistic mouth opening (proportional to realistic face size — never oversized cartoon!)
+    if mouth_state in {"small", "mid", "wide", "o", "yawn"}:
+        overlay = Image.new("RGBA", img.size, (0, 0, 0, 0))
+        odraw = ImageDraw.Draw(overlay)
+        rx = max(2, int(h * (0.012 if mouth_state in {"mid", "wide"} else 0.008)))
+        ry = max(1, int(h * (0.007 if mouth_state in {"wide", "yawn"} else 0.0045)))
+        odraw.ellipse((cx - rx, cy - ry, cx + rx, cy + ry), fill=(115, 38, 48, 175))
+        img = Image.alpha_composite(img, overlay)
 
     return img

@@ -114,6 +114,60 @@
       max-width: 280px;
       text-align: left;
     }
+    /* Realistic 3D CGI Parallax Stage (Default High-Graphic Mode) */
+    #cgiStage {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+      z-index: 2;
+      pointer-events: auto;
+    }
+    #cgiStage.hidden { display: none; }
+    .cgi-rig {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform-style: preserve-3d;
+      transition: transform 0.14s ease-out;
+      margin-bottom: 58px;
+    }
+    .cgi-char {
+      height: min(64vh, 520px);
+      width: auto;
+      filter: drop-shadow(0 26px 34px rgba(0, 0, 0, 0.58)) drop-shadow(0 0 24px rgba(244, 114, 182, 0.22));
+      user-select: none;
+      transition: opacity 0.12s ease;
+    }
+    .cgi-char.bob { animation: cgiBob 2.6s ease-in-out infinite; }
+    .cgi-char.walk-hop { animation: cgiHop 0.38s ease-in-out infinite; }
+    .cgi-char.run-hop { animation: cgiRun 0.25s ease-in-out infinite; }
+    .cgi-char.talk-nod { animation: cgiTalk 0.45s ease-in-out infinite; }
+    .cgi-pedestal {
+      width: 280px;
+      height: 54px;
+      margin-top: -22px;
+      border-radius: 50%;
+      background: radial-gradient(ellipse at center, rgba(244, 114, 182, 0.34) 0%, rgba(28, 34, 54, 0.92) 55%, rgba(11, 14, 24, 0.95) 100%);
+      border: 2px solid rgba(244, 114, 182, 0.72);
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65), inset 0 2px 12px rgba(255, 255, 255, 0.12);
+      transform: rotateX(68deg);
+    }
+    .cgi-emote {
+      position: absolute;
+      top: 10px;
+      right: -28px;
+      font-size: 28px;
+      filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+      animation: cgiBob 1.5s ease-in-out infinite;
+    }
+    @keyframes cgiBob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+    @keyframes cgiHop { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-13px); } }
+    @keyframes cgiRun { 0%, 100% { transform: translateY(0) rotate(2deg); } 50% { transform: translateY(-18px) rotate(-1deg); } }
+    @keyframes cgiTalk { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-3px) scale(1.01); } }
   </style>
   <script type="importmap">
     {
@@ -127,19 +181,27 @@
 <body>
   <div class="hud-top">
     <div class="brand">
-      <h1>Simi — 3D Studio</h1>
-      <p>Sculpted Pixar-Style 3D Character • Drag to Orbit 360° • Scroll to Zoom</p>
+      <h1>Simi — Realistic 3D CGI Studio</h1>
+      <p id="modeSubtitle">High-Graphic Realistic 3D CGI • Move Mouse for 3D Depth • Live Animations</p>
     </div>
     <div class="actions">
       <a class="btn" href="index.html">← Home</a>
-      <button class="btn" onclick="window.exportTransparentPNG()">Save 3D PNG</button>
+      <button class="btn" id="modeToggleBtn" onclick="window.toggleStudioMode()">Switch to 3D Mesh (.GLB Orbit)</button>
       <button class="btn btn-primary" onclick="window.downloadGLB()">Download .GLB Model</button>
     </div>
   </div>
 
-  <div class="bubble" id="speechBubble">Suno na! Rotate me in 3D, switch my kurti, or try Walk, Run &amp; Lip-Sync!</div>
+  <div class="bubble" id="speechBubble">Suno na! Move your mouse for 3D depth, or click Walk, Run, Talk &amp; Comfort!</div>
 
-  <canvas id="viewport"></canvas>
+  <div id="cgiStage">
+    <div class="cgi-rig" id="cgiRig">
+      <span class="cgi-emote" id="cgiEmote">✦</span>
+      <img class="cgi-char bob" id="cgiImg" src="assets/simi_idle.png" alt="Simi Realistic 3D CGI" />
+      <div class="cgi-pedestal"></div>
+    </div>
+  </div>
+
+  <canvas id="viewport" style="display:none;"></canvas>
 
   <div class="hud-bottom">
     <div class="row" id="animRow">
@@ -1083,11 +1145,79 @@
       sleepy: 'Dekho kitni raat ho gayi... aankhein rest karo aur jaldi so jao please.',
     };
 
+    let studioMode = 'cgi'; // 'cgi' (default realistic high-graphic) or 'mesh' (360° GLB orbit)
+    let cgiTimer = null;
+    const cgiStage = document.getElementById('cgiStage');
+    const cgiRig = document.getElementById('cgiRig');
+    const cgiImg = document.getElementById('cgiImg');
+    const cgiEmote = document.getElementById('cgiEmote');
+    const modeToggleBtn = document.getElementById('modeToggleBtn');
+    const modeSubtitle = document.getElementById('modeSubtitle');
+
+    document.addEventListener('mousemove', (e) => {
+      if (studioMode !== 'cgi') return;
+      const nx = (e.clientX / window.innerWidth - 0.5) * 2;
+      const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+      cgiRig.style.transform = `rotateY(${nx * 14}deg) rotateX(${-ny * 8}deg)`;
+    });
+
+    function updateCgiAnimation(name) {
+      if (cgiTimer) { clearInterval(cgiTimer); cgiTimer = null; }
+      cgiImg.className = 'cgi-char';
+      const emotes = {
+        idle: '✦', walk: '♪', run: '🔥', talk: '💬',
+        focus: '💢', care: '♥', laugh: '🏆', sleepy: 'Zzz'
+      };
+      cgiEmote.textContent = emotes[name] || '✦';
+      if (name === 'walk') {
+        cgiImg.classList.add('walk-hop');
+        let f = 0;
+        cgiImg.src = 'assets/simi_walk_1.png';
+        cgiTimer = setInterval(() => {
+          cgiImg.src = (f++ % 2 === 0) ? 'assets/simi_walk_2.png' : 'assets/simi_walk_1.png';
+        }, 210);
+      } else if (name === 'run') {
+        cgiImg.classList.add('run-hop');
+        let f = 0;
+        cgiImg.src = 'assets/simi_run_1.png';
+        cgiTimer = setInterval(() => {
+          cgiImg.src = (f++ % 2 === 0) ? 'assets/simi_run_2.png' : 'assets/simi_run_1.png';
+        }, 140);
+      } else if (name === 'talk') {
+        cgiImg.classList.add('talk-nod');
+        let f = 0;
+        cgiImg.src = 'assets/simi_talk.png';
+        cgiTimer = setInterval(() => {
+          cgiImg.src = (f++ % 2 === 0) ? 'assets/simi_idle.png' : 'assets/simi_talk.png';
+        }, 240);
+      } else {
+        cgiImg.classList.add('bob');
+        cgiImg.src = `assets/simi_${name === 'laugh' ? 'laugh' : name}.png`;
+      }
+    }
+
+    window.toggleStudioMode = () => {
+      studioMode = (studioMode === 'cgi') ? 'mesh' : 'cgi';
+      if (studioMode === 'cgi') {
+        cgiStage.classList.remove('hidden');
+        canvas.style.display = 'none';
+        modeToggleBtn.textContent = 'Switch to 3D Mesh (.GLB Orbit)';
+        modeSubtitle.textContent = 'High-Graphic Realistic 3D CGI • Move Mouse for 3D Depth • Live Animations';
+      } else {
+        cgiStage.classList.add('hidden');
+        canvas.style.display = 'block';
+        modeToggleBtn.textContent = 'Switch to Realistic 3D CGI';
+        modeSubtitle.textContent = 'Real-Time 360° 3D Mesh • Drag to Orbit • Scroll to Zoom';
+      }
+    };
+
     window.setAnim = (name) => {
       currentAnim = name;
       bubbleEl.textContent = animLines[name] || '';
       document.querySelectorAll('#animRow .chip').forEach(b => b.classList.toggle('active', b.dataset.anim === name));
+      updateCgiAnimation(name);
     };
+    updateCgiAnimation('idle');
 
     window.setOutfit = (style) => {
       const t = makeKurtiTextures(style);

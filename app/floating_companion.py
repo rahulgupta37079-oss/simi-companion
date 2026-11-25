@@ -35,7 +35,7 @@ from app.screen_monitor import (
 )
 from app.time_routines import routine_engine
 from app.voice import voice_engine
-from app.voice_listener import record_utterance, transcribe_audio_sync
+from app.voice_listener import list_microphones, probe_mic_level, record_utterance, transcribe_audio_sync
 
 logger = logging.getLogger("simi.companion")
 
@@ -779,7 +779,7 @@ class FloatingSimiApp:
         win.title("Simi — AI Brain & Profile")
         win.attributes("-topmost", True)
         win.configure(bg="#171a23")
-        win.geometry("430x430")
+        win.geometry("440x490")
         win.resizable(False, False)
 
         pad = {"padx": 14, "pady": 4}
@@ -810,6 +810,13 @@ class FloatingSimiApp:
             ],
         ).pack(fill="x", padx=14, pady=2)
 
+        lbl("Microphone Input (for listening to you):")
+        mics = [(-1, "System Default Microphone")] + list_microphones()
+        mic_labels = [f"{idx}: {name}" if idx >= 0 else name for idx, name in mics]
+        cur_mic_label = next((m for (i, _), m in zip(mics, mic_labels) if i == cfg.mic_device_index), mic_labels[0])
+        mic_var = tk.StringVar(value=cur_mic_label)
+        ttk.Combobox(win, textvariable=mic_var, state="readonly", values=mic_labels).pack(fill="x", padx=14, pady=2)
+
         lbl("AI Brain:")
         prov_var = tk.StringVar(value=cfg.ai_provider)
         ttk.Combobox(
@@ -831,16 +838,24 @@ class FloatingSimiApp:
             fill="x", padx=14, ipady=4
         )
 
-        status_lbl = tk.Label(win, text="", bg="#171a23", fg="#fde68a", font=("Segoe UI", 9), wraplength=390)
+        status_lbl = tk.Label(win, text="", bg="#171a23", fg="#fde68a", font=("Segoe UI", 9), wraplength=400)
         status_lbl.pack(anchor="w", padx=14, pady=6)
 
         btn_row = tk.Frame(win, bg="#171a23")
         btn_row.pack(fill="x", padx=14, pady=8)
 
+        def _selected_mic_idx() -> int:
+            sel = mic_var.get()
+            for (idx, _), label in zip(mics, mic_labels):
+                if label == sel:
+                    return idx
+            return -1
+
         def save_only():
             c = load_config()
             c.user_name = name_var.get().strip()
             c.voice_name = voice_var.get().strip() or "en-IN-NeerjaExpressiveNeural"
+            c.mic_device_index = _selected_mic_idx()
             c.ai_provider = prov_var.get()
             c.gemini_api_key = gem_var.get().strip()
             c.groq_api_key = groq_var.get().strip()
@@ -851,6 +866,22 @@ class FloatingSimiApp:
             save_only()
             voice_engine.speak("Suno na, tumne khana khaya? Aapne yeh kitne achhe se kiya, so proud!")
             status_lbl.configure(text="Speaking sample with selected voice...")
+
+        def test_mic_btn():
+            save_only()
+            status_lbl.configure(text="Speak now for 1.5 seconds to test your mic...")
+
+            def _m():
+                ok, rms, peak = probe_mic_level(_selected_mic_idx(), duration_sec=1.5)
+                if not ok:
+                    msg = "Mic error: could not open selected microphone."
+                elif peak < 15:
+                    msg = f"Mic is very quiet/muted (peak {peak:.0f}). Check mute switch or pick another mic!"
+                else:
+                    msg = f"Mic working great! Detected sound (RMS {rms:.0f}, peak {peak:.0f})."
+                win.after(0, lambda: status_lbl.configure(text=msg))
+
+            threading.Thread(target=_m, daemon=True).start()
 
         def test_conn():
             save_only()
@@ -863,9 +894,10 @@ class FloatingSimiApp:
 
             threading.Thread(target=_t, daemon=True).start()
 
-        tk.Button(btn_row, text="Test Voice", command=test_voice_btn, bg="#2a3040", fg="#fff", relief="flat", padx=10, pady=5).pack(side="left", padx=(0, 6))
-        tk.Button(btn_row, text="Test AI", command=test_conn, bg="#2a3040", fg="#fff", relief="flat", padx=10, pady=5).pack(side="left")
-        tk.Button(btn_row, text="Save & Close", command=lambda: (save_only(), win.destroy()), bg="#f59e0b", fg="#111", relief="flat", font=("Segoe UI", 9, "bold"), padx=14, pady=5).pack(side="right")
+        tk.Button(btn_row, text="Test Voice", command=test_voice_btn, bg="#2a3040", fg="#fff", relief="flat", padx=8, pady=5).pack(side="left", padx=(0, 5))
+        tk.Button(btn_row, text="Test Mic", command=test_mic_btn, bg="#2a3040", fg="#fff", relief="flat", padx=8, pady=5).pack(side="left", padx=(0, 5))
+        tk.Button(btn_row, text="Test AI", command=test_conn, bg="#2a3040", fg="#fff", relief="flat", padx=8, pady=5).pack(side="left")
+        tk.Button(btn_row, text="Save & Close", command=lambda: (save_only(), win.destroy()), bg="#f59e0b", fg="#111", relief="flat", font=("Segoe UI", 9, "bold"), padx=12, pady=5).pack(side="right")
         self.settings_win = win
 
     # ---------------- Walking, Running & Floating Movement ----------------

@@ -22,13 +22,19 @@ BLOCK_MS = 80
 BLOCK_SAMPLES = int(SAMPLE_RATE * BLOCK_MS / 1000)
 
 
-def _pcm_to_wav_bytes(pcm: np.ndarray) -> bytes:
+def _pcm_to_wav_bytes(pcm: np.ndarray, sample_rate: int = SAMPLE_RATE) -> bytes:
+    """Normalize quiet mic audio safely (without clipping) and encode mono 16-bit WAV bytes."""
+    arr = pcm.astype(np.float32)
+    peak = float(np.max(np.abs(arr))) if arr.size else 0.0
+    if 150.0 < peak < 24000.0:
+        gain = min(6.0, 24000.0 / peak)
+        arr = np.clip(arr * gain, -32767.0, 32767.0)
     buf = io.BytesIO()
     with wave.open(buf, "wb") as wf:
         wf.setnchannels(1)
         wf.setsampwidth(2)
-        wf.setframerate(SAMPLE_RATE)
-        wf.writeframes(pcm.astype(np.int16).tobytes())
+        wf.setframerate(sample_rate)
+        wf.writeframes(arr.astype(np.int16).tobytes())
     return buf.getvalue()
 
 
@@ -36,13 +42,32 @@ def list_microphones() -> list[Tuple[int, str]]:
     try:
         import sounddevice as sd
 
-        return [
-            (i, str(d["name"]))
-            for i, d in enumerate(sd.query_devices())
-            if d.get("max_input_channels", 0) > 0
-        ]
+        seen = set()
+        out = []
+        for i, d in enumerate(sd.query_devices()):
+            if d.get("max_input_channels", 0) > 0:
+                name = str(d["name"]).strip()
+                if name and name not in seen and "Mapper" not in name and "Primary" not in name:
+                    seen.add(name)
+                    out.append((i, name))
+        return out
     except Exception:
         return []
+
+
+def probe_mic_level(device_index: int = -1, duration_sec: float = 1.2) -> Tuple[bool, float, float]:
+    """Quick 1.2s mic level check returning (ok, rms, peak)."""
+    try:
+        import sounddevice as sd
+
+        dev = None if device_index < 0 else device_index
+        rec = sd.rec(int(SAMPLE_RATE * duration_sec), samplerate=SAMPLE_RATE, channels=1, dtype="int16", device=dev)
+        sd.wait()
+        arr = rec[:, 0].astype(np.float32)
+        return True, float(np.sqrt(np.mean(arr * arr))), float(np.max(np.abs(arr)))
+    except Exception as exc:
+        logger.warning("Mic probe failed: %s", exc)
+        return False, 0.0, 0.0
 
 
 def record_utterance(
@@ -78,7 +103,8 @@ def record_utterance(
                 arr = data[:, 0].astype(np.float32)
                 cal_rms.append(float(np.sqrt(np.mean(arr * arr))) + 1.0)
             noise_floor = float(np.median(cal_rms))
-            speech_thresh = max(320.0, noise_floor * 2.6)
+            # Tuned for both close headsets and laptop/webcam mics across the desk
+            speech_thresh = max(180.0, noise_floor * 1.9 + 75.0)
 
             started = False
             speech_blocks = 0

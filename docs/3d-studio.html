@@ -6,9 +6,8 @@
   <title>Simi — Interactive 3D Character Studio</title>
   <style>
     :root {
-      --bg: #0b0e16;
-      --panel: rgba(20, 25, 38, 0.88);
-      --border: rgba(255, 255, 255, 0.12);
+      --panel: rgba(18, 22, 34, 0.84);
+      --border: rgba(255, 255, 255, 0.13);
       --text: #f3f5fa;
       --muted: #9aa4bc;
       --amber: #f59e0b;
@@ -20,18 +19,14 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: radial-gradient(circle at 50% 35%, #231932 0%, #101422 55%, #090b12 100%);
+      background: radial-gradient(circle at 50% 34%, #352348 0%, #191e33 54%, #0b0e18 100%);
       color: var(--text);
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
-    #viewport {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
+    #viewport { width: 100%; height: 100%; display: block; }
     .hud-top {
       position: fixed;
-      top: 16px;
+      top: 14px;
       left: 16px;
       right: 16px;
       display: flex;
@@ -44,22 +39,14 @@
     .brand {
       pointer-events: auto;
       background: var(--panel);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(14px);
       border: 1px solid var(--border);
       border-radius: 14px;
       padding: 10px 16px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
     }
     .brand h1 { margin: 0; font-size: 16px; font-weight: 800; }
     .brand p { margin: 0; font-size: 12px; color: var(--muted); }
-    .actions {
-      pointer-events: auto;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .actions { pointer-events: auto; display: flex; gap: 8px; flex-wrap: wrap; }
     .btn {
       background: var(--panel);
       backdrop-filter: blur(12px);
@@ -71,9 +58,8 @@
       font-weight: 600;
       cursor: pointer;
       text-decoration: none;
-      transition: transform 0.14s ease, border-color 0.14s ease;
     }
-    .btn:hover { transform: translateY(-1px); border-color: var(--pink); }
+    .btn:hover { border-color: var(--pink); }
     .btn-primary {
       background: linear-gradient(135deg, var(--amber), var(--pink));
       color: #111827;
@@ -81,39 +67,27 @@
     }
     .hud-bottom {
       position: fixed;
-      bottom: 18px;
+      bottom: 12px;
       left: 50%;
       transform: translateX(-50%);
-      width: min(920px, calc(100% - 24px));
+      width: min(940px, calc(100% - 24px));
       background: var(--panel);
       backdrop-filter: blur(14px);
       border: 1px solid var(--border);
       border-radius: 16px;
-      padding: 12px 14px;
+      padding: 9px 14px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 7px;
       z-index: 10;
     }
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-      align-items: center;
-      justify-content: center;
-    }
-    .label {
-      font-size: 11px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      margin-right: 4px;
-    }
+    .row { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; justify-content: center; }
+    .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-right: 4px; }
     .chip {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 6px 11px;
+      padding: 5px 11px;
       border-radius: 9px;
       font-size: 12.5px;
       font-weight: 600;
@@ -121,25 +95,24 @@
     }
     .chip.active, .chip:hover {
       border-color: var(--pink);
-      background: rgba(244, 114, 182, 0.2);
+      background: rgba(244, 114, 182, 0.22);
       color: #fde68a;
     }
     .bubble {
       position: fixed;
-      top: 86px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff7f3;
+      top: 82px;
+      right: 24px;
+      background: rgba(255, 248, 245, 0.96);
       color: #1f2937;
       border: 2px solid var(--pink);
       border-radius: 14px;
-      padding: 8px 16px;
-      font-size: 13.5px;
+      padding: 8px 14px;
+      font-size: 13px;
       font-weight: 600;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
       z-index: 9;
-      max-width: 420px;
-      text-align: center;
+      max-width: 280px;
+      text-align: left;
     }
   </style>
   <script type="importmap">
@@ -154,19 +127,17 @@
 <body>
   <div class="hud-top">
     <div class="brand">
-      <div>
-        <h1>Simi — 3D Studio</h1>
-        <p>Drag to rotate 360° • Scroll to zoom • PBR Lighting &amp; Live 3D Animation</p>
-      </div>
+      <h1>Simi — 3D Studio</h1>
+      <p>Sculpted Pixar-Style 3D Character • Drag to Orbit 360° • Scroll to Zoom</p>
     </div>
     <div class="actions">
-      <a class="btn" href="index.html">← Back to Website</a>
-      <button class="btn" onclick="window.exportTransparentPNG()">Save 3D Pose PNG</button>
-      <button class="btn btn-primary" onclick="window.downloadGLB()">Download 3D Model (.glb)</button>
+      <a class="btn" href="index.html">← Home</a>
+      <button class="btn" onclick="window.exportTransparentPNG()">Save 3D PNG</button>
+      <button class="btn btn-primary" onclick="window.downloadGLB()">Download .GLB Model</button>
     </div>
   </div>
 
-  <div class="bubble" id="speechBubble">Suno na! Rotate me in 3D, switch my kurti, or click Walk &amp; Run!</div>
+  <div class="bubble" id="speechBubble">Suno na! Rotate me in 3D, switch my kurti, or try Walk, Run &amp; Lip-Sync!</div>
 
   <canvas id="viewport"></canvas>
 
@@ -174,17 +145,17 @@
     <div class="row" id="animRow">
       <span class="label">Animation:</span>
       <button class="chip active" data-anim="idle" onclick="window.setAnim('idle')">Idle Wave</button>
-      <button class="chip" data-anim="walk" onclick="window.setAnim('walk')">Walk Cycle</button>
-      <button class="chip" data-anim="run" onclick="window.setAnim('run')">Run Sprint</button>
+      <button class="chip" data-anim="walk" onclick="window.setAnim('walk')">Walk</button>
+      <button class="chip" data-anim="run" onclick="window.setAnim('run')">Run</button>
       <button class="chip" data-anim="talk" onclick="window.setAnim('talk')">Talk (Lip-Sync)</button>
       <button class="chip" data-anim="focus" onclick="window.setAnim('focus')">Playful Scold</button>
       <button class="chip" data-anim="care" onclick="window.setAnim('care')">Comfort Hug</button>
-      <button class="chip" data-anim="laugh" onclick="window.setAnim('laugh')">Celebrate Jump</button>
+      <button class="chip" data-anim="laugh" onclick="window.setAnim('laugh')">Celebrate</button>
       <button class="chip" data-anim="sleepy" onclick="window.setAnim('sleepy')">Sleepy Night</button>
     </div>
     <div class="row" id="outfitRow">
-      <span class="label">Outfit (from Photos):</span>
-      <button class="chip active" data-outfit="peach" onclick="window.setOutfit('peach')">Peach Embroidered Kurti + Mint Dupatta</button>
+      <span class="label">Outfit:</span>
+      <button class="chip active" data-outfit="peach" onclick="window.setOutfit('peach')">Peach Embroidered + Mint Dupatta</button>
       <button class="chip" data-outfit="paisley" onclick="window.setOutfit('paisley')">Blue-Purple Paisley Kurti</button>
       <button class="chip" data-outfit="floral" onclick="window.setOutfit('floral')">Pastel Pink Floral Kurti</button>
     </div>
@@ -203,491 +174,879 @@
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.12;
+    renderer.toneMappingExposure = 1.06;
 
     const scene = new THREE.Scene();
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    scene.environmentIntensity = 0.42;
 
-    const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0.25, 1.48, 3.65);
+    // Clean full-body framing with pedestal completely visible above bottom HUD bar
+    const camera = new THREE.PerspectiveCamera(29, window.innerWidth / window.innerHeight, 0.05, 60);
+    camera.position.set(0.18, 1.15, 4.95);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.06;
-    controls.target.set(0, 1.08, 0);
-    controls.minDistance = 1.6;
-    controls.maxDistance = 6.0;
+    controls.target.set(0, 0.80, 0);
+    controls.minDistance = 1.4;
+    controls.maxDistance = 6.8;
     controls.maxPolarAngle = Math.PI * 0.56;
 
-    // 3-Point Pixar-style Studio Lighting
-    const keyLight = new THREE.DirectionalLight(0xfff1e0, 2.3);
-    keyLight.position.set(2.8, 4.4, 3.2);
+    // Balanced 4-Point Warm Pixar Studio Lighting (even luminous caramel-tan skin, zero pale-forehead/dark-chin split)
+    const keyLight = new THREE.DirectionalLight(0xfff4e6, 1.65);
+    keyLight.position.set(2.2, 2.4, 4.0);
     keyLight.castShadow = true;
-    keyLight.shadow.mapSize.set(1024, 1024);
-    keyLight.shadow.bias = -0.0005;
+    keyLight.shadow.mapSize.set(2048, 2048);
+    keyLight.shadow.bias = -0.0004;
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0xd8b4fe, 0.95);
-    fillLight.position.set(-3.2, 2.5, 2.0);
+    const fillLight = new THREE.DirectionalLight(0xffe8e6, 1.15);
+    fillLight.position.set(-3.0, 1.4, 3.2);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0xf472b6, 1.5);
-    rimLight.position.set(-1.5, 3.4, -3.5);
+    const bounceLight = new THREE.DirectionalLight(0xffdfc8, 1.25);
+    bounceLight.position.set(0.0, -1.2, 3.8);
+    scene.add(bounceLight);
+
+    const rimLight = new THREE.DirectionalLight(0xf9a8d4, 1.75);
+    rimLight.position.set(-1.4, 2.8, -3.6);
     scene.add(rimLight);
 
-    scene.add(new THREE.HemisphereLight(0xffe4e6, 0x1e293b, 0.7));
+    const rimLight2 = new THREE.DirectionalLight(0xc4b5fd, 1.15);
+    rimLight2.position.set(2.2, 2.4, -3.2);
+    scene.add(rimLight2);
 
-    // Subtle glossy stage pedestal & contact shadow
+    scene.add(new THREE.HemisphereLight(0xfff5f5, 0x4c3558, 0.85));
+
+    // Studio Pedestal
     const pedestal = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.95, 1.05, 0.08, 48),
-      new THREE.MeshStandardMaterial({ color: 0x1e2436, roughness: 0.35, metalness: 0.25 })
+      new THREE.CylinderGeometry(0.64, 0.74, 0.055, 64),
+      new THREE.MeshStandardMaterial({ color: 0x1e2438, roughness: 0.32, metalness: 0.25 })
     );
-    pedestal.position.y = -0.04;
+    pedestal.position.y = -0.028;
     pedestal.receiveShadow = true;
     scene.add(pedestal);
 
     const ringGlow = new THREE.Mesh(
-      new THREE.RingGeometry(0.92, 0.96, 64),
-      new THREE.MeshBasicMaterial({ color: 0xf472b6, side: THREE.DoubleSide, transparent: true, opacity: 0.65 })
+      new THREE.RingGeometry(0.61, 0.645, 64),
+      new THREE.MeshBasicMaterial({ color: 0xf472b6, side: THREE.DoubleSide, transparent: true, opacity: 0.82 })
     );
     ringGlow.rotation.x = -Math.PI / 2;
-    ringGlow.position.y = 0.004;
+    ringGlow.position.y = 0.002;
     scene.add(ringGlow);
 
-    // Procedural High-Detail Kurti Fabric Textures matching her actual photos
-    function makeKurtiTexture(style) {
+    // ==================== High-Res Painted Face, Iris & Kurti Textures ====================
+    function makeFaceTexture() {
       const c = document.createElement('canvas');
-      c.width = 512; c.height = 512;
+      c.width = 1024; c.height = 1024;
+      const ctx = c.getContext('2d');
+      // Warm caramel-tan Indian Pixar skin
+      ctx.fillStyle = '#d6976e';
+      ctx.fillRect(0, 0, 1024, 1024);
+
+      // Soft lit front-face center around u=0.25 (x=256)
+      const glow = ctx.createRadialGradient(256, 520, 20, 256, 520, 210);
+      glow.addColorStop(0, '#e3a67d');
+      glow.addColorStop(1, '#d29168');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 280, 512, 480);
+
+      // Soft rosy Pixar cheeks right under the glasses rims (x=256 ± 60, y=560)
+      for (const cx of [196, 316]) {
+        const g = ctx.createRadialGradient(cx, 560, 8, cx, 560, 48);
+        g.addColorStop(0, 'rgba(236, 95, 118, 0.44)');
+        g.addColorStop(0.55, 'rgba(236, 95, 118, 0.18)');
+        g.addColorStop(1, 'rgba(236, 95, 118, 0)');
+        ctx.fillStyle = g;
+        ctx.fillRect(cx - 54, 506, 108, 108);
+      }
+
+      // Subtle warm nose highlight
+      const ng = ctx.createRadialGradient(256, 558, 3, 256, 558, 20);
+      ng.addColorStop(0, 'rgba(255, 205, 178, 0.35)');
+      ng.addColorStop(1, 'rgba(255, 205, 178, 0)');
+      ctx.fillStyle = ng;
+      ctx.fillRect(230, 530, 52, 52);
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function makeIrisTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 256;
+      const ctx = c.getContext('2d');
+      const g = ctx.createRadialGradient(128, 128, 14, 128, 128, 124);
+      g.addColorStop(0, '#100602');
+      g.addColorStop(0.30, '#1c0b05');
+      g.addColorStop(0.45, '#592c16');
+      g.addColorStop(0.78, '#7e4422');
+      g.addColorStop(0.92, '#2d1408');
+      g.addColorStop(1, '#100602');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 256, 256);
+
+      ctx.strokeStyle = 'rgba(255, 198, 132, 0.22)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 40; i++) {
+        const a = (i / 40) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(128 + Math.cos(a) * 42, 128 + Math.sin(a) * 42);
+        ctx.lineTo(128 + Math.cos(a) * 106, 128 + Math.sin(a) * 106);
+        ctx.stroke();
+      }
+      const cres = ctx.createRadialGradient(128, 178, 6, 128, 178, 56);
+      cres.addColorStop(0, 'rgba(255, 212, 156, 0.68)');
+      cres.addColorStop(1, 'rgba(255, 212, 156, 0)');
+      ctx.fillStyle = cres;
+      ctx.fillRect(60, 120, 136, 114);
+
+      // Twin crisp sparkling Pixar catchlights
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.ellipse(88, 82, 26, 22, -0.35, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(170, 156, 11, 0, Math.PI * 2); ctx.fill();
+
+      const tex = new THREE.CanvasTexture(c);
+      tex.colorSpace = THREE.SRGBColorSpace;
+      return tex;
+    }
+
+    function makeKurtiTextures(style) {
+      const c = document.createElement('canvas');
+      c.width = 1024; c.height = 1024;
       const ctx = c.getContext('2d');
 
+      const b = document.createElement('canvas');
+      b.width = 512; b.height = 512;
+      const bctx = b.getContext('2d');
+      bctx.fillStyle = '#808080';
+      bctx.fillRect(0, 0, 512, 512);
+
       if (style === 'peach') {
-        ctx.fillStyle = '#f2a49c';
-        ctx.fillRect(0, 0, 512, 512);
-        // Subtle woven sheen
-        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-        for (let y = 0; y < 512; y += 6) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(512, y); ctx.stroke(); }
-        // Center yoke embroidered panel (like Photo 2!)
-        ctx.fillStyle = 'rgba(232, 138, 128, 0.55)';
-        ctx.fillRect(196, 0, 120, 230);
-        ctx.strokeStyle = '#f8e3d6';
-        ctx.lineWidth = 3;
-        ctx.strokeRect(200, 4, 112, 222);
-        // Delicate pastel embroidery motifs & buttons
-        for (let y = 26; y < 210; y += 28) {
-          ctx.fillStyle = '#fde68a';
-          ctx.beginPath(); ctx.arc(256, y, 5, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = '#b7e4c7';
-          ctx.beginPath(); ctx.arc(224, y + 6, 4, 0, Math.PI * 2); ctx.fill();
-          ctx.beginPath(); ctx.arc(288, y + 6, 4, 0, Math.PI * 2); ctx.fill();
+        // Warm coral-peach kurti matching Reference Photo 2!
+        const grad = ctx.createLinearGradient(0, 0, 0, 1024);
+        grad.addColorStop(0, '#f3a192');
+        grad.addColorStop(1, '#e88b7d');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, 1024, 1024);
+
+        // Linen micro-weave
+        ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+        for (let i = 0; i < 1024; i += 8) {
+          ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(1024, i); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 1024); ctx.stroke();
         }
-        // Subtle scattered floral sparkles
-        for (let i = 0; i < 65; i++) {
-          const x = (i * 83) % 512, y = (i * 137) % 512;
-          ctx.fillStyle = 'rgba(255,245,235,0.45)';
-          ctx.beginPath(); ctx.arc(x, y, 2.5, 0, Math.PI * 2); ctx.fill();
+
+        // Rich mint + silver embroidered front chest panel (u=0.5 -> x=512, top y=24..420)
+        ctx.fillStyle = 'rgba(218, 112, 100, 0.42)';
+        ctx.fillRect(420, 24, 184, 390);
+        ctx.strokeStyle = '#e6f7ea';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(428, 32, 168, 374);
+        ctx.strokeStyle = '#9be0b3';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(442, 46, 140, 346);
+
+        // Floral vine embroidery columns on chest yoke
+        for (let y = 78; y < 380; y += 48) {
+          for (const dx of [-42, 42]) {
+            ctx.fillStyle = '#c9f2d5';
+            ctx.beginPath(); ctx.ellipse(512 + dx, y, 16, 7, dx > 0 ? 0.45 : -0.45, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#fff8f0';
+            ctx.beginPath(); ctx.arc(512 + dx * 0.72, y + 14, 5, 0, Math.PI * 2); ctx.fill();
+            bctx.fillStyle = '#f0f0f0';
+            bctx.beginPath(); bctx.arc((512 + dx) / 2, y / 2, 7, 0, Math.PI * 2); bctx.fill();
+          }
+        }
+        // Subtle floral dots across lower flare
+        for (let i = 0; i < 120; i++) {
+          const x = (i * 113 + 37) % 1024, y = 440 + ((i * 197 + 53) % 520);
+          ctx.fillStyle = 'rgba(255, 246, 238, 0.48)';
+          ctx.beginPath(); ctx.arc(x, y, 4.5, 0, Math.PI * 2); ctx.fill();
+        }
+        // Embroidered white/mint bottom scalloped lace trim
+        ctx.fillStyle = '#fff5ee';
+        for (let x = 0; x < 1024; x += 26) {
+          ctx.beginPath(); ctx.arc(x + 13, 1008, 13, 0, Math.PI * 2); ctx.fill();
         }
       } else if (style === 'paisley') {
-        // Blue-purple paisley kurti (from Photos 1 & 3!)
-        ctx.fillStyle = '#3b4a7a';
-        ctx.fillRect(0, 0, 512, 512);
-        const colors = ['#7dd3fc', '#c084fc', '#f472b6', '#5eead4', '#e0e7ff'];
-        for (let i = 0; i < 180; i++) {
-          const x = (i * 97 + 19) % 512;
-          const y = (i * 151 + 31) % 512;
+        ctx.fillStyle = '#334173';
+        ctx.fillRect(0, 0, 1024, 1024);
+        const cols = ['#7dd3fc', '#c084fc', '#f472b6', '#5eead4', '#e0e7ff'];
+        for (let i = 0; i < 340; i++) {
+          const x = (i * 139 + 29) % 1024;
+          const y = (i * 223 + 41) % 1024;
           ctx.save();
           ctx.translate(x, y);
-          ctx.rotate((i % 7) * 0.8);
-          ctx.fillStyle = colors[i % colors.length];
-          ctx.globalAlpha = 0.72;
+          ctx.rotate((i % 9) * 0.7);
+          ctx.fillStyle = cols[i % cols.length];
+          ctx.globalAlpha = 0.8;
           ctx.beginPath();
-          ctx.ellipse(0, 0, 12, 6, 0, 0, Math.PI * 2);
+          ctx.moveTo(0, -18);
+          ctx.bezierCurveTo(16, -12, 14, 16, 0, 20);
+          ctx.bezierCurveTo(-14, 16, -12, -8, 0, -18);
           ctx.fill();
           ctx.strokeStyle = '#1e1b4b';
-          ctx.lineWidth = 1.5;
+          ctx.lineWidth = 2;
           ctx.stroke();
           ctx.restore();
         }
       } else {
-        // Pastel pink floral kurti with white lace border
-        ctx.fillStyle = '#f6d1cf';
-        ctx.fillRect(0, 0, 512, 512);
-        for (let i = 0; i < 95; i++) {
-          const x = (i * 73 + 23) % 512;
-          const y = (i * 119 + 17) % 512;
+        ctx.fillStyle = '#f7d6d4';
+        ctx.fillRect(0, 0, 1024, 1024);
+        for (let i = 0; i < 190; i++) {
+          const x = (i * 107 + 23) % 1024;
+          const y = (i * 179 + 19) % 950;
           ctx.fillStyle = i % 2 === 0 ? '#e07a68' : '#a78bfa';
-          ctx.globalAlpha = 0.75;
+          ctx.globalAlpha = 0.82;
           for (let p = 0; p < 5; p++) {
             const a = (p / 5) * Math.PI * 2;
             ctx.beginPath();
-            ctx.arc(x + Math.cos(a) * 5, y + Math.sin(a) * 5, 3, 0, Math.PI * 2);
+            ctx.arc(x + Math.cos(a) * 8, y + Math.sin(a) * 8, 5, 0, Math.PI * 2);
             ctx.fill();
           }
-          ctx.fillStyle = '#749f82';
-          ctx.fillRect(x - 1, y + 6, 2, 7);
+          ctx.fillStyle = '#fde68a';
+          ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#6b9a78';
+          ctx.fillRect(x - 2, y + 10, 4, 12);
         }
         ctx.globalAlpha = 1;
         ctx.fillStyle = '#ffffff';
-        for (let x = 0; x < 512; x += 14) {
-          ctx.beginPath(); ctx.arc(x + 7, 502, 7, 0, Math.PI * 2); ctx.fill();
+        for (let x = 0; x < 1024; x += 24) {
+          ctx.beginPath(); ctx.arc(x + 12, 1008, 12, 0, Math.PI * 2); ctx.fill();
+        }
+      }
+      const map = new THREE.CanvasTexture(c);
+      map.colorSpace = THREE.SRGBColorSpace;
+      map.wrapS = map.wrapT = THREE.RepeatWrapping;
+      const bump = new THREE.CanvasTexture(b);
+      bump.wrapS = bump.wrapT = THREE.RepeatWrapping;
+      return { map, bump };
+    }
+
+    // ==================== Sculpted Pixar Anatomy Builders ====================
+    function makeSculptedHeadGeo() {
+      const geo = new THREE.SphereGeometry(0.275, 64, 48);
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        let x = pos.getX(i);
+        let y = pos.getY(i);
+        let z = pos.getZ(i);
+
+        // Classic Pixar/Nendoroid cute ratio: fuller cheeks, compact gentle chin (NO bulbous bottom!)
+        y *= 0.99;
+        x *= 1.03;
+
+        if (y < -0.02) {
+          const t = Math.min(1, (-y - 0.02) / 0.25);
+          // Smooth feminine V-oval jaw taper
+          x *= (1.0 - t * 0.26);
+          if (z > 0) z *= (1.0 - t * 0.10);
+          // Pull bottom chin slightly up so lower face is compact & cute
+          y += t * t * 0.032;
+        }
+
+        // Cute soft apple cheeks right under glasses
+        const cheekL = Math.exp(-((x + 0.125) ** 2 / 0.0085 + (y + 0.048) ** 2 / 0.006 + (z - 0.21) ** 2 / 0.012));
+        const cheekR = Math.exp(-((x - 0.125) ** 2 / 0.0085 + (y + 0.048) ** 2 / 0.006 + (z - 0.21) ** 2 / 0.012));
+        z += (cheekL + cheekR) * 0.022;
+
+        // Gentle recessed eye sockets at lowered 47% eye line (y = -0.012)
+        const sockL = Math.exp(-((x + 0.095) ** 2 / 0.0052 + (y + 0.012) ** 2 / 0.004 + (z - 0.235) ** 2 / 0.012));
+        const sockR = Math.exp(-((x - 0.095) ** 2 / 0.0052 + (y + 0.012) ** 2 / 0.004 + (z - 0.235) ** 2 / 0.012));
+        z -= (sockL + sockR) * 0.024;
+
+        // Cute soft sculpted nose tip right between eyes & smile
+        const noseTip = Math.exp(-(x ** 2 / 0.00075 + (y + 0.056) ** 2 / 0.00095 + (z - 0.258) ** 2 / 0.008));
+        z += noseTip * 0.028;
+
+        pos.setXYZ(i, x, y, z);
+      }
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    function makeRoundedGlassesRim(w, h, r, thickness) {
+      function roundedRectPath(rw, rh, rr) {
+        const p = new THREE.Shape();
+        const x = -rw / 2, y = -rh / 2;
+        p.moveTo(x + rr, y);
+        p.lineTo(x + rw - rr, y);
+        p.quadraticCurveTo(x + rw, y, x + rw, y + rr);
+        p.lineTo(x + rw, y + rh - rr);
+        p.quadraticCurveTo(x + rw, y + rh, x + rw - rr, y + rh);
+        p.lineTo(x + rr, y + rh);
+        p.quadraticCurveTo(x, y + rh, x, y + rh - rr);
+        p.lineTo(x, y + rr);
+        p.quadraticCurveTo(x, y, x + rr, y);
+        return p;
+      }
+      const outer = roundedRectPath(w, h, r);
+      const hole = roundedRectPath(w - thickness * 2, h - thickness * 2, Math.max(0.004, r - thickness * 0.8));
+      outer.holes.push(hole);
+      const geo = new THREE.ExtrudeGeometry(outer, {
+        depth: 0.007,
+        bevelEnabled: true,
+        bevelThickness: 0.0022,
+        bevelSize: 0.0018,
+        bevelSegments: 4,
+      });
+      geo.center();
+      return geo;
+    }
+
+    function makeHairRibbon(points, rStart, rEnd) {
+      const curve = new THREE.CatmullRomCurve3(points.map(p => new THREE.Vector3(...p)));
+      const tubularSegs = 22;
+      const radialSegs = 10;
+      const geo = new THREE.TubeGeometry(curve, tubularSegs, rStart, radialSegs, false);
+      const pos = geo.attributes.position;
+      const v = new THREE.Vector3();
+      for (let i = 0; i <= tubularSegs; i++) {
+        const t = i / tubularSegs;
+        const center = curve.getPointAt(t);
+        const factor = (1.0 - t) * 0.85 + (rEnd / rStart) * t + Math.sin(t * Math.PI) * 0.22;
+        for (let j = 0; j <= radialSegs; j++) {
+          const idx = i * (radialSegs + 1) + j;
+          v.fromBufferAttribute(pos, idx).sub(center).multiplyScalar(factor).add(center);
+          pos.setXYZ(idx, v.x, v.y, v.z);
+        }
+      }
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    function makeKurtiLatheGeo() {
+      // Bottom-to-top flared A-line kurti with gentle natural hem wave
+      const pts = [
+        new THREE.Vector2(0.285, -0.34),
+        new THREE.Vector2(0.295, -0.315),
+        new THREE.Vector2(0.245, -0.14),
+        new THREE.Vector2(0.178, 0.05),
+        new THREE.Vector2(0.152, 0.16),
+        new THREE.Vector2(0.184, 0.30),
+        new THREE.Vector2(0.175, 0.40),
+        new THREE.Vector2(0.088, 0.43),
+      ];
+      const geo = new THREE.LatheGeometry(pts, 56);
+      geo.scale(1.06, 1.0, 0.86);
+      // Subtle organic cloth drape ripple around bottom skirt hem
+      const pos = geo.attributes.position;
+      for (let i = 0; i < pos.count; i++) {
+        const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+        if (y < 0.02) {
+          const factor = Math.min(1, (0.02 - y) / 0.36);
+          const ang = Math.atan2(z, x);
+          const ripple = 1.0 + Math.sin(ang * 7) * 0.028 * factor;
+          pos.setXYZ(i, x * ripple, y, z * ripple);
+        }
+      }
+      geo.computeVertexNormals();
+      return geo;
+    }
+
+    function makeTaperedLegGeo() {
+      // Smooth continuous salwar/churidar leg with subtle ankle gathers (NO harsh knee pipe seam!)
+      const pts = [
+        new THREE.Vector2(0.036, -0.47),
+        new THREE.Vector2(0.041, -0.44),
+        new THREE.Vector2(0.038, -0.41),
+        new THREE.Vector2(0.043, -0.37),
+        new THREE.Vector2(0.046, -0.25),
+        new THREE.Vector2(0.054, -0.12),
+        new THREE.Vector2(0.058, 0.0),
+      ];
+      return new THREE.LatheGeometry(pts, 24);
+    }
+
+    // ==================== PBR Materials ====================
+    const faceTex = makeFaceTexture();
+    const headMat = new THREE.MeshPhysicalMaterial({
+      map: faceTex,
+      roughness: 0.56,
+      sheen: 0.42,
+      sheenColor: new THREE.Color(0xffb4a2),
+      sheenRoughness: 0.72,
+    });
+    const skinMat = new THREE.MeshPhysicalMaterial({
+      color: 0xd6976e,
+      roughness: 0.56,
+      sheen: 0.40,
+      sheenColor: new THREE.Color(0xffb4a2),
+      sheenRoughness: 0.72,
+    });
+    // Soft matte-satin espresso-black hair (NO plastic white highlight bands!)
+    const hairMat = new THREE.MeshPhysicalMaterial({
+      color: 0x221b26,
+      roughness: 0.60,
+      metalness: 0.02,
+      sheen: 0.48,
+      sheenColor: new THREE.Color(0x94a3b8),
+      sheenRoughness: 0.58,
+    });
+    const glassesFrameMat = new THREE.MeshPhysicalMaterial({
+      color: 0x16171d,
+      roughness: 0.22,
+      metalness: 0.30,
+      clearcoat: 0.75,
+    });
+    const lensMat = new THREE.MeshPhysicalMaterial({
+      color: 0xe0f2fe,
+      roughness: 0.05,
+      transparent: true,
+      opacity: 0.13,
+      clearcoat: 1.0,
+    });
+    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf7c957, roughness: 0.22, metalness: 0.94 });
+    const silverMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.24, metalness: 0.90 });
+    const peachTex = makeKurtiTextures('peach');
+    const kurtiMat = new THREE.MeshPhysicalMaterial({
+      map: peachTex.map,
+      bumpMap: peachTex.bump,
+      bumpScale: 0.008,
+      roughness: 0.66,
+      sheen: 0.40,
+      sheenColor: new THREE.Color(0xffe4e6),
+    });
+    const buttonMat = new THREE.MeshStandardMaterial({ color: 0xee9587, roughness: 0.52 });
+    const dupattaMat = new THREE.MeshPhysicalMaterial({
+      color: 0xa2e8b8,
+      roughness: 0.58,
+      transparent: true,
+      opacity: 0.90,
+      sheen: 0.45,
+      side: THREE.DoubleSide,
+    });
+    const leggingMat = new THREE.MeshStandardMaterial({ color: 0xf4f6fa, roughness: 0.74 });
+    const sandalMat = new THREE.MeshStandardMaterial({ color: 0xb07c56, roughness: 0.52 });
+    const lipMat = new THREE.MeshPhysicalMaterial({ color: 0xbf686b, roughness: 0.42, clearcoat: 0.22 });
+
+    function makePlacketTexture() {
+      const c = document.createElement('canvas');
+      c.width = 256; c.height = 512;
+      const ctx = c.getContext('2d');
+      ctx.fillStyle = '#e58e80';
+      ctx.fillRect(0, 0, 256, 512);
+      ctx.strokeStyle = '#fff5ec';
+      ctx.lineWidth = 8;
+      ctx.strokeRect(10, 10, 236, 492);
+      ctx.strokeStyle = '#a7e8be';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(24, 24, 208, 464);
+      // Intricate mint & silver floral embroidery down both sides of chest placket
+      for (let y = 58; y < 465; y += 64) {
+        for (const dx of [-58, 58]) {
+          ctx.fillStyle = '#c8f5d6';
+          ctx.beginPath(); ctx.ellipse(128 + dx, y, 22, 10, dx > 0 ? 0.45 : -0.45, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#fff7ed';
+          ctx.beginPath(); ctx.arc(128 + dx * 0.68, y + 18, 7, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = '#fde68a';
+          ctx.beginPath(); ctx.arc(128 + dx * 0.95, y - 14, 4.5, 0, Math.PI * 2); ctx.fill();
         }
       }
       const tex = new THREE.CanvasTexture(c);
       tex.colorSpace = THREE.SRGBColorSpace;
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
       return tex;
     }
+    const placketMat = new THREE.MeshPhysicalMaterial({ map: makePlacketTexture(), roughness: 0.58, sheen: 0.45 });
 
-    // Shared PBR Materials
-    const skinMat = new THREE.MeshPhysicalMaterial({
-      color: 0xc98b63,
-      roughness: 0.44,
-      metalness: 0.0,
-      sheen: 0.45,
-      sheenColor: new THREE.Color(0xffb4a2),
-      sheenRoughness: 0.65,
-    });
-    const blushMat = new THREE.MeshBasicMaterial({
-      color: 0xff6b8b,
-      transparent: true,
-      opacity: 0.24,
-      depthWrite: false,
-    });
-    const hairMat = new THREE.MeshPhysicalMaterial({
-      color: 0x161418,
-      roughness: 0.28,
-      metalness: 0.08,
-      clearcoat: 0.45,
-      clearcoatRoughness: 0.35,
-    });
-    const glassesFrameMat = new THREE.MeshPhysicalMaterial({
-      color: 0x14151a,
-      roughness: 0.18,
-      metalness: 0.35,
-      clearcoat: 0.8,
-    });
-    const lensMat = new THREE.MeshPhysicalMaterial({
-      color: 0xffffff,
-      roughness: 0.05,
-      metalness: 0.0,
-      transmission: 0.88,
-      transparent: true,
-      opacity: 0.26,
-      ior: 1.48,
-    });
-    const goldMat = new THREE.MeshStandardMaterial({ color: 0xf6c453, roughness: 0.22, metalness: 0.92 });
-    const silverMat = new THREE.MeshStandardMaterial({ color: 0xd8dee9, roughness: 0.28, metalness: 0.88 });
-    const kurtiMat = new THREE.MeshPhysicalMaterial({
-      map: makeKurtiTexture('peach'),
-      roughness: 0.62,
-      sheen: 0.5,
-      sheenColor: new THREE.Color(0xffe4e6),
-    });
-    const dupattaMat = new THREE.MeshPhysicalMaterial({
-      color: 0xa7e3b5,
-      roughness: 0.55,
-      transparent: true,
-      opacity: 0.92,
-      sheen: 0.4,
-    });
-    const leggingMat = new THREE.MeshStandardMaterial({ color: 0xf1f5f9, roughness: 0.72 });
-    const sandalMat = new THREE.MeshStandardMaterial({ color: 0xb07d56, roughness: 0.55 });
-
-    // ==================== Build Sculpted Articulated 3D Simi Rig ====================
+    // ==================== Assemble Character Rig ====================
     const simi = new THREE.Group();
-    simi.name = 'Simi3DCharacter';
+    simi.name = 'SimiSculpted3D';
     scene.add(simi);
 
     const hips = new THREE.Group();
-    hips.position.y = 0.78;
+    hips.position.y = 0.76;
     simi.add(hips);
 
-    // Torso / Kurti Body
     const torso = new THREE.Group();
     hips.add(torso);
 
-    const upperBody = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.21, 0.42, 32), kurtiMat);
-    upperBody.position.y = 0.22;
-    upperBody.scale.set(1.12, 1, 0.84);
-    upperBody.castShadow = true;
-    torso.add(upperBody);
+    // Rotate +PI/2 so the embroidered front placket (u=0.5) faces +Z right on her chest!
+    const kurtiMesh = new THREE.Mesh(makeKurtiLatheGeo(), kurtiMat);
+    kurtiMesh.rotation.y = Math.PI / 2;
+    kurtiMesh.castShadow = true;
+    kurtiMesh.receiveShadow = true;
+    torso.add(kurtiMesh);
 
-    const kurtiSkirt = new THREE.Mesh(new THREE.CylinderGeometry(0.21, 0.29, 0.38, 32), kurtiMat);
-    kurtiSkirt.position.y = -0.14;
-    kurtiSkirt.scale.set(1.1, 1, 0.88);
-    kurtiSkirt.castShadow = true;
-    torso.add(kurtiSkirt);
+    // Dedicated 3D Embroidered Chest Placket + Coral Fabric Buttons cleanly popped in front of +Z chest!
+    const peachButtons = new THREE.Group();
+    const placketGeo = new THREE.CylinderGeometry(0.178, 0.160, 0.25, 24, 1, true, -0.44, 0.88);
+    const placketMesh = new THREE.Mesh(placketGeo, placketMat);
+    placketMesh.position.set(0, 0.24, 0.016);
+    placketMesh.scale.set(1.06, 1.0, 0.92);
+    peachButtons.add(placketMesh);
+    for (const [by, bz] of [[0.33, 0.178], [0.27, 0.175], [0.21, 0.169], [0.15, 0.163]]) {
+      const btn = new THREE.Mesh(new THREE.CylinderGeometry(0.0135, 0.0135, 0.010, 18), buttonMat);
+      btn.rotation.x = Math.PI / 2;
+      btn.position.set(0, by, bz);
+      peachButtons.add(btn);
+      const rim = new THREE.Mesh(new THREE.TorusGeometry(0.0135, 0.0024, 8, 18), goldMat);
+      rim.position.set(0, by, bz + 0.005);
+      peachButtons.add(rim);
+    }
+    torso.add(peachButtons);
 
-    // Mint Dupatta scarf draped gracefully over one shoulder (visible in Peach outfit!)
+    // Sculpted Scoop-Neck Skin Collarbone Wedge so neck flows naturally into shoulders!
+    const collarSkin = new THREE.Mesh(
+      new THREE.SphereGeometry(0.118, 28, 20),
+      skinMat
+    );
+    collarSkin.scale.set(1.12, 0.58, 0.88);
+    collarSkin.position.set(0, 0.395, 0.074);
+    torso.add(collarSkin);
+
+    // Softly Pleated 3-Fold Mint Dupatta draped naturally over her shoulder (NO stiff green board!)
     const dupatta = new THREE.Group();
-    const dupStrand = new THREE.Mesh(new THREE.CapsuleGeometry(0.042, 0.52, 8, 16), dupattaMat);
-    dupStrand.position.set(0.15, 0.16, 0.12);
-    dupStrand.rotation.z = 0.14;
-    dupStrand.rotation.x = -0.08;
-    dupatta.add(dupStrand);
-    const dupBack = new THREE.Mesh(new THREE.CapsuleGeometry(0.042, 0.48, 8, 16), dupattaMat);
-    dupBack.position.set(0.15, 0.14, -0.11);
-    dupBack.rotation.z = 0.1;
-    dupatta.add(dupBack);
+    const dupFolds = [
+      [[0.125, 0.405, -0.14], [0.16, 0.415, -0.01], [0.145, 0.34, 0.135], [0.125, 0.10, 0.168], [0.165, -0.22, 0.225]],
+      [[0.145, 0.40, -0.13],  [0.18, 0.408, 0.01],  [0.170, 0.32, 0.138], [0.155, 0.09, 0.162], [0.205, -0.23, 0.215]],
+      [[0.105, 0.408, -0.14], [0.14, 0.418, -0.02], [0.120, 0.34, 0.138], [0.098, 0.11, 0.162], [0.132, -0.20, 0.230]],
+    ];
+    dupFolds.forEach((pts) => {
+      const m = new THREE.Mesh(makeHairRibbon(pts, 0.018, 0.022), dupattaMat);
+      m.castShadow = true;
+      dupatta.add(m);
+    });
     torso.add(dupatta);
 
-    // Neck + Dainty Gold Chain
-    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.072, 0.082, 0.14, 24), skinMat);
-    neck.position.y = 0.47;
+    // Slimmer Tapered Neck + Gleaming Dainty Gold Chain resting clearly on collarbone
+    const neck = new THREE.Mesh(new THREE.CylinderGeometry(0.050, 0.066, 0.13, 28), skinMat);
+    neck.position.y = 0.455;
     neck.castShadow = true;
     torso.add(neck);
 
-    const goldChain = new THREE.Mesh(new THREE.TorusGeometry(0.095, 0.007, 12, 36), goldMat);
-    goldChain.position.set(0, 0.42, 0.03);
-    goldChain.rotation.x = Math.PI * 0.42;
-    torso.add(goldChain);
+    const chainCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.072, 0.432, 0.055),
+      new THREE.Vector3(-0.054, 0.392, 0.156),
+      new THREE.Vector3(0.0, 0.372, 0.192),
+      new THREE.Vector3(0.054, 0.392, 0.156),
+      new THREE.Vector3(0.072, 0.432, 0.055),
+    ]);
+    torso.add(new THREE.Mesh(new THREE.TubeGeometry(chainCurve, 28, 0.0052, 8, false), goldMat));
+    const pendant = new THREE.Mesh(new THREE.OctahedronGeometry(0.012, 1), goldMat);
+    pendant.position.set(0, 0.362, 0.196);
+    torso.add(pendant);
 
-    // ==================== Head & Expressive Face ====================
+    // ==================== Sculpted Head, Lowered Big Pixar Eyes, Beaming Smile & Center-Part Hair ====================
     const head = new THREE.Group();
-    head.position.y = 0.54;
+    head.position.y = 0.515;
     torso.add(head);
 
-    // Soft Pixar-proportioned oval head
-    const skull = new THREE.Mesh(new THREE.SphereGeometry(0.295, 48, 40), skinMat);
-    skull.position.y = 0.26;
-    skull.scale.set(0.95, 1.04, 0.94);
-    skull.castShadow = true;
-    head.add(skull);
+    const headMesh = new THREE.Mesh(makeSculptedHeadGeo(), headMat);
+    headMesh.position.y = 0.255;
+    headMesh.castShadow = true;
+    head.add(headMesh);
 
-    // Cute gentle chin & soft cheeks
-    const cheekL = new THREE.Mesh(new THREE.SphereGeometry(0.068, 20, 16), blushMat);
-    cheekL.position.set(-0.145, 0.21, 0.215);
-    cheekL.scale.set(1.2, 0.72, 0.5);
-    head.add(cheekL);
-    const cheekR = cheekL.clone();
-    cheekR.position.x = 0.145;
-    head.add(cheekR);
+    // Cute Sculpted Ears + Prominent Oxidized Silver Bell Jhumka Earrings (2x visible!)
+    for (const side of [-1, 1]) {
+      const earG = new THREE.Group();
+      const ear = new THREE.Mesh(new THREE.SphereGeometry(0.044, 20, 16), skinMat);
+      ear.scale.set(0.45, 1.05, 0.72);
+      earG.add(ear);
 
-    // Sculpted Nose
-    const nose = new THREE.Mesh(new THREE.SphereGeometry(0.028, 16, 16), skinMat);
-    nose.position.set(0, 0.24, 0.278);
-    nose.scale.set(0.9, 1.15, 1.05);
-    head.add(nose);
-
-    // Ears + Oxidized Silver Jhumka Earrings (signature look from Photo 2!)
-    function makeEarWithJhumka(side) {
-      const g = new THREE.Group();
-      const ear = new THREE.Mesh(new THREE.SphereGeometry(0.052, 18, 16), skinMat);
-      ear.scale.set(0.55, 1.15, 0.8);
-      g.add(ear);
-      // Jhumka stud + bell + tiny pearl drops
-      const stud = new THREE.Mesh(new THREE.SphereGeometry(0.015, 12, 12), silverMat);
-      stud.position.set(side * 0.015, -0.038, 0.01);
-      g.add(stud);
-      const bell = new THREE.Mesh(new THREE.ConeGeometry(0.028, 0.042, 16), silverMat);
-      bell.position.set(side * 0.018, -0.072, 0.01);
-      g.add(bell);
-      for (let i = 0; i < 6; i++) {
-        const a = (i / 6) * Math.PI * 2;
-        const bead = new THREE.Mesh(new THREE.SphereGeometry(0.006, 8, 8), silverMat);
-        bead.position.set(side * 0.018 + Math.cos(a) * 0.024, -0.095, 0.01 + Math.sin(a) * 0.024);
-        g.add(bead);
+      // Detailed Silver Jhumka: lotus stud + fluted bell + pearl fringe clearly visible from front!
+      const stud = new THREE.Mesh(new THREE.SphereGeometry(0.016, 14, 12), silverMat);
+      stud.position.set(side * 0.016, -0.038, 0.018);
+      earG.add(stud);
+      const dome = new THREE.Mesh(new THREE.SphereGeometry(0.022, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), silverMat);
+      dome.position.set(side * 0.022, -0.068, 0.020);
+      earG.add(dome);
+      const bell = new THREE.Mesh(new THREE.ConeGeometry(0.034, 0.048, 20), silverMat);
+      bell.position.set(side * 0.022, -0.088, 0.020);
+      earG.add(bell);
+      for (let k = 0; k < 8; k++) {
+        const a = (k / 8) * Math.PI * 2;
+        const bead = new THREE.Mesh(new THREE.SphereGeometry(0.0065, 8, 8), silverMat);
+        bead.position.set(side * 0.022 + Math.cos(a) * 0.030, -0.114, 0.020 + Math.sin(a) * 0.030);
+        earG.add(bead);
       }
-      g.position.set(side * 0.272, 0.24, -0.01);
-      return g;
+      earG.position.set(side * 0.256, 0.228, 0.005);
+      head.add(earG);
     }
-    head.add(makeEarWithJhumka(-1));
-    head.add(makeEarWithJhumka(1));
 
-    // Detailed 3D Eyes with Blinking Eyelids & Arched Eyebrows
+    // Large Expressive Pixar/Nendoroid Glossy Eyes positioned at natural 47% head height (y = 0.242)
+    const irisTex = makeIrisTexture();
     const eyelids = [];
     const eyebrows = [];
-    function makeEye(side) {
-      const g = new THREE.Group();
-      g.position.set(side * 0.098, 0.285, 0.238);
+    for (const side of [-1, 1]) {
+      const eg = new THREE.Group();
+      eg.position.set(side * 0.095, 0.242, 0.214);
 
       const sclera = new THREE.Mesh(
-        new THREE.SphereGeometry(0.048, 24, 20),
-        new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.12, clearcoat: 0.9 })
+        new THREE.SphereGeometry(0.060, 28, 24),
+        new THREE.MeshPhysicalMaterial({ color: 0xfffdfb, roughness: 0.1, clearcoat: 0.9 })
       );
-      sclera.scale.set(1.08, 0.96, 0.72);
-      g.add(sclera);
+      sclera.scale.set(1.06, 0.98, 0.74);
+      eg.add(sclera);
 
-      const iris = new THREE.Mesh(
-        new THREE.SphereGeometry(0.032, 24, 20),
-        new THREE.MeshPhysicalMaterial({ color: 0x2c160c, roughness: 0.1, clearcoat: 1.0 })
+      const irisDisc = new THREE.Mesh(
+        new THREE.SphereGeometry(0.046, 28, 20, 0, Math.PI * 2, 0, Math.PI * 0.48),
+        new THREE.MeshPhysicalMaterial({ map: irisTex, roughness: 0.06, clearcoat: 1.0 })
       );
-      iris.position.set(0, -0.002, 0.022);
-      iris.scale.set(1, 1, 0.6);
-      g.add(iris);
+      irisDisc.rotation.x = Math.PI / 2;
+      irisDisc.position.set(0, -0.002, 0.015);
+      eg.add(irisDisc);
 
-      const glint = new THREE.Mesh(new THREE.SphereGeometry(0.009, 12, 12), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-      glint.position.set(0.012, 0.012, 0.041);
-      g.add(glint);
+      // Curved lush upper eyelash wing
+      const lashCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-side * 0.055, 0.015, 0.036),
+        new THREE.Vector3(0, 0.052, 0.045),
+        new THREE.Vector3(side * 0.058, 0.022, 0.032),
+        new THREE.Vector3(side * 0.070, 0.030, 0.024),
+      ]);
+      eg.add(new THREE.Mesh(new THREE.TubeGeometry(lashCurve, 16, 0.0072, 8, false), hairMat));
 
-      const glint2 = new THREE.Mesh(new THREE.SphereGeometry(0.0045, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-      glint2.position.set(-0.01, -0.008, 0.041);
-      g.add(glint2);
-
-      // Animated Eyelid cap
+      // Blinking upper eyelid
       const lid = new THREE.Mesh(
-        new THREE.SphereGeometry(0.052, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.52),
+        new THREE.SphereGeometry(0.063, 24, 16, 0, Math.PI * 2, 0, Math.PI * 0.54),
         skinMat
       );
       lid.scale.set(1.08, 1.0, 0.78);
-      lid.rotation.x = -Math.PI * 0.36; // open
-      g.add(lid);
+      lid.rotation.x = -Math.PI * 0.42;
+      eg.add(lid);
       eyelids.push(lid);
 
-      // Soft arched eyebrow
-      const brow = new THREE.Mesh(new THREE.CapsuleGeometry(0.009, 0.068, 6, 12), hairMat);
-      brow.position.set(0, 0.072, 0.022);
-      brow.rotation.z = Math.PI / 2 - side * 0.1;
-      g.add(brow);
-      eyebrows.push({ mesh: brow, side });
+      // Expressive arched eyebrow framed cleanly ABOVE the sleek glasses rim!
+      const browCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(-side * 0.048, 0.082, 0.036),
+        new THREE.Vector3(side * 0.005, 0.097, 0.041),
+        new THREE.Vector3(side * 0.056, 0.079, 0.028),
+      ]);
+      const browMesh = new THREE.Mesh(new THREE.TubeGeometry(browCurve, 14, 0.0068, 8, false), hairMat);
+      eg.add(browMesh);
+      eyebrows.push({ mesh: browMesh, side });
 
-      return g;
+      head.add(eg);
     }
-    head.add(makeEye(-1));
-    head.add(makeEye(1));
 
-    // Animated 3D Working Mouth (Lips + Bright Smile Teeth + Open Interior!)
+    // ==================== HER SIGNATURE RADIANT BEAMING SMILE (Properly +Z in front of face!) ====================
     const mouthGroup = new THREE.Group();
-    mouthGroup.position.set(0, 0.155, 0.258);
+    mouthGroup.position.set(0, 0.135, 0.256);
     head.add(mouthGroup);
 
-    const mouthCavity = new THREE.Mesh(
-      new THREE.SphereGeometry(0.048, 20, 16),
-      new THREE.MeshStandardMaterial({ color: 0x8f2d3b, roughness: 0.4 })
+    // Smile cavity nestled cleanly at z = -0.002 so it NEVER hides inside head mesh!
+    const smileInterior = new THREE.Mesh(
+      new THREE.SphereGeometry(0.048, 24, 16),
+      new THREE.MeshStandardMaterial({ color: 0x8f293c, roughness: 0.45 })
     );
-    mouthCavity.scale.set(1.35, 0.62, 0.42);
-    mouthGroup.add(mouthCavity);
+    smileInterior.scale.set(1.22, 0.56, 0.28);
+    smileInterior.position.set(0, -0.004, -0.004);
+    mouthGroup.add(smileInterior);
 
-    const teeth = new THREE.Mesh(
-      new THREE.BoxGeometry(0.092, 0.022, 0.02),
-      new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.15, clearcoat: 0.7 })
-    );
-    teeth.position.set(0, 0.012, 0.012);
-    mouthGroup.add(teeth);
+    // Bright Joyful Rounded White Teeth Arch (signature smile from both reference photos!)
+    const teethCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.046, 0.008, -0.010),
+      new THREE.Vector3(-0.022, 0.002, 0.005),
+      new THREE.Vector3(0, 0.001, 0.009),
+      new THREE.Vector3(0.022, 0.002, 0.005),
+      new THREE.Vector3(0.046, 0.008, -0.010),
+    ]);
+    mouthGroup.add(new THREE.Mesh(
+      new THREE.TubeGeometry(teethCurve, 20, 0.0095, 10, false),
+      new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.12, clearcoat: 0.85 })
+    ));
 
-    const tongue = new THREE.Mesh(
-      new THREE.SphereGeometry(0.028, 14, 12),
-      new THREE.MeshStandardMaterial({ color: 0xe87584, roughness: 0.4 })
-    );
-    tongue.position.set(0, -0.015, 0.008);
-    tongue.scale.set(1.2, 0.6, 0.5);
-    mouthGroup.add(tongue);
+    // Delicate Rosy Upper Lip Curve
+    const upperLipCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.056, 0.014, -0.013),
+      new THREE.Vector3(-0.024, 0.011, 0.006),
+      new THREE.Vector3(0, 0.008, 0.010),
+      new THREE.Vector3(0.024, 0.011, 0.006),
+      new THREE.Vector3(0.056, 0.014, -0.013),
+    ]);
+    mouthGroup.add(new THREE.Mesh(new THREE.TubeGeometry(upperLipCurve, 22, 0.0056, 10, false), lipMat));
 
-    // Sleek Black Rectangular 3D Glasses (accurate to all 4 photos!)
+    // Animated Lower Lip Pivot (opens smoothly during Talk Lip-Sync!)
+    const lowerLipPivot = new THREE.Group();
+    mouthGroup.add(lowerLipPivot);
+    const lowerLipCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.052, 0.011, -0.011),
+      new THREE.Vector3(-0.024, -0.017, 0.005),
+      new THREE.Vector3(0, -0.024, 0.009),
+      new THREE.Vector3(0.024, -0.017, 0.005),
+      new THREE.Vector3(0.052, 0.011, -0.011),
+    ]);
+    lowerLipPivot.add(new THREE.Mesh(new THREE.TubeGeometry(lowerLipCurve, 22, 0.0068, 10, false), lipMat));
+
+    // ==================== Sleek Thin Rounded-Square Wayfarer 3D Glasses (+8% wider) ====================
     const glasses = new THREE.Group();
-    glasses.position.set(0, 0.285, 0.285);
-    function makeLensFrame(side) {
-      const f = new THREE.Group();
-      const w = 0.145, h = 0.105, t = 0.012;
-      const topBar = new THREE.Mesh(new THREE.BoxGeometry(w, t, t), glassesFrameMat); topBar.position.y = h / 2;
-      const botBar = new THREE.Mesh(new THREE.BoxGeometry(w, t, t), glassesFrameMat); botBar.position.y = -h / 2;
-      const outBar = new THREE.Mesh(new THREE.BoxGeometry(t, h, t), glassesFrameMat); outBar.position.x = side * (w / 2);
-      const inBar  = new THREE.Mesh(new THREE.BoxGeometry(t, h, t), glassesFrameMat); inBar.position.x = -side * (w / 2);
-      const glass  = new THREE.Mesh(new THREE.PlaneGeometry(w - 0.01, h - 0.01), lensMat);
-      f.add(topBar, botBar, outBar, inBar, glass);
-      f.position.x = side * 0.102;
-      // Temple arm back to ear
-      const arm = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.01, 0.29), glassesFrameMat);
-      arm.position.set(side * (w / 2), 0.018, -0.145);
-      f.add(arm);
-      return f;
+    glasses.position.set(0, 0.242, 0.280);
+    const rimGeo = makeRoundedGlassesRim(0.166, 0.120, 0.030, 0.0064);
+    for (const side of [-1, 1]) {
+      const lg = new THREE.Group();
+      lg.position.x = side * 0.104;
+      lg.add(new THREE.Mesh(rimGeo, glassesFrameMat));
+      lg.add(new THREE.Mesh(new THREE.PlaneGeometry(0.150, 0.104), lensMat));
+      const armCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(side * 0.082, 0.020, -0.004),
+        new THREE.Vector3(side * 0.146, 0.012, -0.10),
+        new THREE.Vector3(side * 0.158, -0.004, -0.26),
+        new THREE.Vector3(side * 0.150, -0.042, -0.32),
+      ]);
+      lg.add(new THREE.Mesh(new THREE.TubeGeometry(armCurve, 16, 0.0038, 8, false), glassesFrameMat));
+      glasses.add(lg);
     }
-    glasses.add(makeLensFrame(-1), makeLensFrame(1));
-    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, 0.012), glassesFrameMat);
-    bridge.position.y = 0.015;
-    glasses.add(bridge);
+    const bridgeCurve = new THREE.CatmullRomCurve3([
+      new THREE.Vector3(-0.023, 0.018, 0.0),
+      new THREE.Vector3(0, 0.024, 0.004),
+      new THREE.Vector3(0.023, 0.018, 0.0),
+    ]);
+    glasses.add(new THREE.Mesh(new THREE.TubeGeometry(bridgeCurve, 12, 0.0040, 8, false), glassesFrameMat));
     head.add(glasses);
 
-    // Center-Parted Dark Hair + Loose Side Wisps + Articulated Bouncy Ponytail
-    const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.312, 40, 32, 0, Math.PI * 2, 0, Math.PI * 0.62), hairMat);
-    hairCap.position.set(0, 0.28, -0.02);
-    hairCap.scale.set(0.98, 1.04, 1.0);
-    hairCap.castShadow = true;
-    head.add(hairCap);
+    // ==================== Natural Center-Parted Hair (ZERO Chin-Strap Rim, Softer Lower Hairline!) ====================
+    const hairGroup = new THREE.Group();
+    head.add(hairGroup);
 
-    // Center-parted front sweeps
+    // Top/back crown volume shifted slightly higher & back so ZERO dark crescent ever shows under chin!
+    const hairCrown = new THREE.Mesh(
+      new THREE.SphereGeometry(0.282, 48, 36, 0, Math.PI * 2, 0, Math.PI * 0.50),
+      hairMat
+    );
+    hairCrown.position.set(0, 0.282, -0.028);
+    hairCrown.rotation.x = -0.82;
+    hairCrown.scale.set(1.03, 1.01, 1.00);
+    hairCrown.castShadow = true;
+    hairGroup.add(hairCrown);
+
+    // Back-of-head volume tucked strictly high & behind ears (never protrudes under jawline!)
+    const hairBack = new THREE.Mesh(new THREE.SphereGeometry(0.228, 36, 28), hairMat);
+    hairBack.position.set(0, 0.285, -0.132);
+    hairBack.scale.set(0.98, 0.88, 0.80);
+    hairGroup.add(hairBack);
+
+    // Lowered Soft Center-Parted Sweeping Curtains framing her forehead + clearly visible wispy strands!
     for (const side of [-1, 1]) {
-      const sweep = new THREE.Mesh(new THREE.CapsuleGeometry(0.065, 0.24, 10, 16), hairMat);
-      sweep.position.set(side * 0.175, 0.36, 0.13);
-      sweep.rotation.z = side * 0.62;
-      sweep.rotation.x = 0.22;
-      head.add(sweep);
-
-      // Cute loose face-framing hair wisp (from Photos 1 & 2!)
-      const wisp = new THREE.Mesh(new THREE.CapsuleGeometry(0.014, 0.18, 6, 10), hairMat);
-      wisp.position.set(side * 0.255, 0.16, 0.11);
-      wisp.rotation.z = -side * 0.15;
-      head.add(wisp);
+      const locks = [
+        // Lowered front center-part curtain (y=0.478 -> sweeps cleanly over upper outer forehead corners!)
+        [[0.008 * side, 0.478, 0.155], [0.105 * side, 0.448, 0.215], [0.222 * side, 0.352, 0.172], [0.264 * side, 0.225, 0.035]],
+        [[0.014 * side, 0.505, 0.100], [0.135 * side, 0.472, 0.165], [0.254 * side, 0.352, 0.095], [0.256 * side, 0.20, -0.06]],
+        [[0.020 * side, 0.525, 0.01],  [0.168 * side, 0.472, 0.06],  [0.270 * side, 0.325, -0.01], [0.222 * side, 0.18, -0.14]],
+        [[0.026 * side, 0.510, -0.09], [0.192 * side, 0.425, -0.07], [0.240 * side, 0.27, -0.16],  [0.12 * side, 0.16, -0.24]],
+        // Clearly visible delicate wispy face-framing strands curving past temples & cheeks!
+        [[0.168 * side, 0.405, 0.178], [0.236 * side, 0.295, 0.162], [0.246 * side, 0.165, 0.120], [0.214 * side, 0.060, 0.098]],
+        [[0.140 * side, 0.422, 0.192], [0.215 * side, 0.318, 0.178], [0.224 * side, 0.205, 0.148], [0.198 * side, 0.115, 0.128]],
+      ];
+      locks.forEach((pts, idx) => {
+        const r0 = idx >= 4 ? 0.016 : 0.044;
+        const r1 = idx >= 4 ? 0.004 : 0.016;
+        const m = new THREE.Mesh(makeHairRibbon(pts, r0, r1), hairMat);
+        m.castShadow = true;
+        hairGroup.add(m);
+      });
     }
 
-    // Articulated Low Ponytail
+    // Lush Wavy Low Ponytail draping softly over her left shoulder
     const ponytail = new THREE.Group();
-    ponytail.position.set(0, 0.16, -0.27);
+    ponytail.position.set(-0.05, 0.145, -0.26);
     head.add(ponytail);
-    const ponyTie = new THREE.Mesh(new THREE.TorusGeometry(0.045, 0.012, 10, 20), new THREE.MeshStandardMaterial({ color: 0xf472b6, roughness: 0.4 }));
-    ponytail.add(ponyTie);
-    const ponyBody = new THREE.Mesh(new THREE.ConeGeometry(0.11, 0.44, 24), hairMat);
-    ponyBody.position.set(0, -0.20, -0.05);
-    ponyBody.rotation.x = Math.PI + 0.25;
-    ponyBody.castShadow = true;
-    ponytail.add(ponyBody);
 
-    // ==================== Articulated 3D Arms & Legs ====================
+    ponytail.add(new THREE.Mesh(
+      new THREE.TorusGeometry(0.045, 0.017, 12, 24),
+      new THREE.MeshPhysicalMaterial({ color: 0xf472b6, roughness: 0.52, sheen: 0.55 })
+    ));
+
+    const ponyStrands = [
+      [[0, 0, 0], [-0.06, -0.08, -0.08], [-0.16, -0.23, -0.07], [-0.22, -0.40, 0.0]],
+      [[-0.02, 0.01, 0], [-0.12, -0.07, -0.04], [-0.21, -0.22, -0.02], [-0.25, -0.37, 0.06]],
+      [[0.02, 0.01, 0], [0.01, -0.09, -0.09], [-0.08, -0.25, -0.10], [-0.14, -0.42, -0.03]],
+      [[0, 0.02, 0], [-0.05, -0.06, -0.12], [-0.13, -0.22, -0.14], [-0.18, -0.39, -0.08]],
+      [[0, -0.01, 0], [-0.09, -0.12, -0.02], [-0.17, -0.28, 0.01], [-0.19, -0.42, 0.07]],
+    ];
+    ponyStrands.forEach((pts, i) => {
+      const m = new THREE.Mesh(makeHairRibbon(pts, i === 0 ? 0.050 : 0.036, 0.008), hairMat);
+      m.castShadow = true;
+      ponytail.add(m);
+    });
+
+    // ==================== Seamless Fitted Arms, Hands & Tapered Churidar Legs ====================
     function makeArm(side) {
       const shoulder = new THREE.Group();
-      shoulder.position.set(side * 0.215, 0.38, 0);
-      const sleeve = new THREE.Mesh(new THREE.CapsuleGeometry(0.056, 0.20, 10, 18), kurtiMat);
-      sleeve.position.y = -0.11;
+      shoulder.position.set(side * 0.176, 0.365, 0.005);
+
+      // Fitted cap/short sleeve matching peach kurti cleanly blended into torso (no exposed ball!)
+      const sleeve = new THREE.Mesh(new THREE.CapsuleGeometry(0.048, 0.12, 10, 20), kurtiMat);
+      sleeve.position.y = -0.065;
       sleeve.castShadow = true;
       shoulder.add(sleeve);
 
+      const upperSkin = new THREE.Mesh(new THREE.CapsuleGeometry(0.036, 0.12, 10, 18), skinMat);
+      upperSkin.position.y = -0.155;
+      upperSkin.castShadow = true;
+      shoulder.add(upperSkin);
+
       const elbow = new THREE.Group();
-      elbow.position.y = -0.23;
+      elbow.position.y = -0.215;
       shoulder.add(elbow);
 
-      const forearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.042, 0.18, 10, 16), skinMat);
-      forearm.position.y = -0.10;
+      // Seamless elbow sphere so zero dark crease appears when elbow bends
+      const elbowJoint = new THREE.Mesh(new THREE.SphereGeometry(0.0355, 16, 14), skinMat);
+      elbow.add(elbowJoint);
+
+      const forearm = new THREE.Mesh(new THREE.CapsuleGeometry(0.032, 0.15, 10, 18), skinMat);
+      forearm.position.y = -0.085;
       forearm.castShadow = true;
       elbow.add(forearm);
 
-      const hand = new THREE.Mesh(new THREE.SphereGeometry(0.048, 16, 14), skinMat);
-      hand.position.y = -0.22;
-      hand.scale.set(0.92, 1.1, 0.72);
+      // Cute Sculpted Pixar Hand with Palm + Angled Thumb + 4 Delicate Fingers!
+      const hand = new THREE.Group();
+      hand.position.y = -0.185;
+      const palm = new THREE.Mesh(new THREE.SphereGeometry(0.036, 18, 14), skinMat);
+      palm.scale.set(0.92, 0.96, 0.54);
+      hand.add(palm);
+
+      const thumb = new THREE.Mesh(new THREE.CapsuleGeometry(0.0095, 0.026, 6, 10), skinMat);
+      thumb.position.set(-side * 0.034, -0.004, 0.008);
+      thumb.rotation.z = side * 0.78;
+      hand.add(thumb);
+
+      for (let f = 0; f < 4; f++) {
+        const fx = (-0.021 + f * 0.014) * side;
+        const flen = f === 1 || f === 2 ? 0.030 : 0.024;
+        const finger = new THREE.Mesh(new THREE.CapsuleGeometry(0.0072, flen, 6, 10), skinMat);
+        finger.position.set(fx, -0.036 - (f === 1 || f === 2 ? 0.004 : 0), 0.003);
+        finger.rotation.z = (-0.12 + f * 0.08) * side;
+        hand.add(finger);
+      }
       elbow.add(hand);
 
       torso.add(shoulder);
       return { shoulder, elbow, hand };
     }
-    const armL = makeArm(-1);
-    const armR = makeArm(1);
+    const armL = makeArm(-1); // viewer's left
+    const armR = makeArm(1);  // viewer's right (waving hand!)
 
+    const legGeo = makeTaperedLegGeo();
     function makeLeg(side) {
       const hip = new THREE.Group();
-      hip.position.set(side * 0.105, -0.24, 0);
+      hip.position.set(side * 0.092, -0.24, -0.01);
 
-      const thigh = new THREE.Mesh(new THREE.CapsuleGeometry(0.068, 0.24, 10, 18), leggingMat);
-      thigh.position.y = -0.14;
-      thigh.castShadow = true;
-      hip.add(thigh);
+      const legMesh = new THREE.Mesh(legGeo, leggingMat);
+      legMesh.castShadow = true;
+      hip.add(legMesh);
 
       const knee = new THREE.Group();
-      knee.position.y = -0.27;
+      knee.position.y = -0.24;
       hip.add(knee);
 
-      const shin = new THREE.Mesh(new THREE.CapsuleGeometry(0.054, 0.22, 10, 16), leggingMat);
-      shin.position.y = -0.13;
-      shin.castShadow = true;
-      knee.add(shin);
-
-      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.056, 16, 14), skinMat);
-      foot.position.set(0, -0.25, 0.035);
-      foot.scale.set(0.85, 0.52, 1.45);
+      const foot = new THREE.Mesh(new THREE.SphereGeometry(0.046, 18, 14), skinMat);
+      foot.position.set(0, -0.252, 0.032);
+      foot.scale.set(0.84, 0.48, 1.48);
       knee.add(foot);
 
-      const sandal = new THREE.Mesh(new THREE.BoxGeometry(0.095, 0.022, 0.17), sandalMat);
-      sandal.position.set(0, -0.275, 0.035);
-      sandal.castShadow = true;
-      knee.add(sandal);
+      const sole = new THREE.Mesh(new THREE.CapsuleGeometry(0.039, 0.080, 8, 14), sandalMat);
+      sole.rotation.x = Math.PI / 2;
+      sole.scale.set(1.0, 1.0, 0.28);
+      sole.position.set(0, -0.272, 0.035);
+      sole.castShadow = true;
+      knee.add(sole);
+
+      const strap = new THREE.Mesh(new THREE.TorusGeometry(0.038, 0.007, 8, 18, Math.PI), sandalMat);
+      strap.position.set(0, -0.256, 0.048);
+      knee.add(strap);
 
       hips.add(hip);
       return { hip, knee };
@@ -695,16 +1054,16 @@
     const legL = makeLeg(-1);
     const legR = makeLeg(1);
 
-    // Floating 3D Glowing Heart (for Comfort Hug mode!)
+    // Glowing Floating 3D Heart for Comfort Hug
     const heartShape = new THREE.Shape();
-    heartShape.moveTo(0, 0.04);
-    heartShape.bezierCurveTo(0, 0.08, -0.07, 0.11, -0.09, 0.05);
-    heartShape.bezierCurveTo(-0.11, -0.01, -0.04, -0.07, 0, -0.10);
-    heartShape.bezierCurveTo(0.04, -0.07, 0.11, -0.01, 0.09, 0.05);
-    heartShape.bezierCurveTo(0.07, 0.11, 0, 0.08, 0, 0.04);
+    heartShape.moveTo(0, 0.035);
+    heartShape.bezierCurveTo(0, 0.08, -0.075, 0.115, -0.095, 0.05);
+    heartShape.bezierCurveTo(-0.115, -0.015, -0.04, -0.075, 0, -0.105);
+    heartShape.bezierCurveTo(0.04, -0.075, 0.115, -0.015, 0.095, 0.05);
+    heartShape.bezierCurveTo(0.075, 0.115, 0, 0.08, 0, 0.035);
     const heart3D = new THREE.Mesh(
-      new THREE.ExtrudeGeometry(heartShape, { depth: 0.035, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.01 }),
-      new THREE.MeshPhysicalMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.55, roughness: 0.2, clearcoat: 1 })
+      new THREE.ExtrudeGeometry(heartShape, { depth: 0.032, bevelEnabled: true, bevelThickness: 0.012, bevelSize: 0.01, bevelSegments: 5 }),
+      new THREE.MeshPhysicalMaterial({ color: 0xf43f5e, emissive: 0xf43f5e, emissiveIntensity: 0.6, roughness: 0.15, clearcoat: 1 })
     );
     heart3D.position.set(0, 0.22, 0.30);
     heart3D.visible = false;
@@ -714,7 +1073,7 @@
     let currentAnim = 'idle';
     const bubbleEl = document.getElementById('speechBubble');
     const animLines = {
-      idle: 'Suno na! Rotate me in 3D, switch my kurti, or click Walk & Run!',
+      idle: 'Suno na! Rotate me in 3D, switch my kurti, or try Walk, Run & Lip-Sync!',
       walk: 'Bas aise hi stroll kar rahi hoon — tum apna kaam karo, main yahin hoon!',
       run: 'Chalo chalo! Running over to keep you energized and winning!',
       talk: 'Suno na, tumne khana khaya? Aapne yeh kitne achhe se complete kiya!',
@@ -731,9 +1090,12 @@
     };
 
     window.setOutfit = (style) => {
-      kurtiMat.map = makeKurtiTexture(style);
+      const t = makeKurtiTextures(style);
+      kurtiMat.map = t.map;
+      kurtiMat.bumpMap = t.bump;
       kurtiMat.needsUpdate = true;
       dupatta.visible = (style === 'peach');
+      peachButtons.visible = (style === 'peach');
       document.querySelectorAll('#outfitRow .chip').forEach(b => b.classList.toggle('active', b.dataset.outfit === style));
     };
 
@@ -771,104 +1133,107 @@
       requestAnimationFrame(animate);
       const t = clock.getElapsedTime();
 
-      // Reset base transforms smoothly
-      hips.position.y = 0.78 + Math.sin(t * 2.4) * 0.015;
+      hips.position.y = 0.76 + Math.sin(t * 2.3) * 0.011;
       hips.rotation.set(0, 0, 0);
       torso.rotation.set(0, 0, 0);
       head.rotation.set(0, 0, 0);
-      armL.shoulder.rotation.set(0, 0, 0.16);
-      armR.shoulder.rotation.set(0, 0, -0.16);
-      armL.elbow.rotation.set(-0.15, 0, 0);
-      armR.elbow.rotation.set(-0.15, 0, 0);
-      legL.hip.rotation.set(0, 0, 0);
-      legR.hip.rotation.set(0, 0, 0);
+
+      // Natural relaxed outward arm resting stance (zero skirt clipping!)
+      armL.shoulder.rotation.set(-0.12, 0, -0.24);
+      armR.shoulder.rotation.set(-0.12, 0, 0.24);
+      armL.elbow.rotation.set(-0.28, 0, 0.10);
+      armR.elbow.rotation.set(-0.28, 0, -0.10);
+
+      // Natural gentle A-stance for legs
+      legL.hip.rotation.set(0, 0, -0.045);
+      legR.hip.rotation.set(0, 0, 0.045);
       legL.knee.rotation.set(0, 0, 0);
       legR.knee.rotation.set(0, 0, 0);
-      ponytail.rotation.set(0, Math.sin(t * 2.4) * 0.12, Math.sin(t * 1.9) * 0.08);
+
+      ponytail.rotation.set(0, Math.sin(t * 2.2) * 0.09, Math.sin(t * 1.8) * 0.07);
       heart3D.visible = false;
 
-      // Natural blinking every ~4 seconds
-      const blinkCycle = t % 4.2;
-      const isBlink = blinkCycle > 4.02;
-      let lidAngle = isBlink ? 0.02 : -Math.PI * 0.36;
+      const blinkCycle = t % 4.3;
+      let lidAngle = (blinkCycle > 4.12) ? 0.02 : -Math.PI * 0.42;
 
-      // Default gentle smile
-      mouthGroup.scale.set(1.0, 0.55, 1.0);
-      eyebrows.forEach(({ mesh, side }) => { mesh.rotation.z = Math.PI / 2 - side * 0.1; });
+      lowerLipPivot.position.y = 0.0;
+      smileInterior.scale.set(1.22, 0.54, 0.28);
+      eyebrows.forEach(({ mesh }) => { mesh.rotation.z = 0; });
 
       if (currentAnim === 'idle') {
-        armR.shoulder.rotation.set(-0.4, 0, -2.25);
-        armR.elbow.rotation.set(0, 0, -0.35 + Math.sin(t * 6.5) * 0.32);
-        head.rotation.z = Math.sin(t * 1.6) * 0.06;
+        // Viewer's right arm (armR, +X) waves cheerfully OUTWARD in open air beside her cheek!
+        armR.shoulder.rotation.set(-0.35, 0, 2.28);
+        armR.elbow.rotation.set(0, 0, 0.36 + Math.sin(t * 6.0) * 0.25);
+        // Viewer's left arm rests softly beside hip in front of kurti
+        armL.shoulder.rotation.set(-0.18, 0, -0.26);
+        armL.elbow.rotation.set(-0.32, 0, 0.14);
+        head.rotation.z = Math.sin(t * 1.5) * 0.05;
       } else if (currentAnim === 'walk') {
         const w = t * 6.2;
-        hips.position.y = 0.78 + Math.abs(Math.sin(w)) * 0.045;
+        hips.position.y = 0.76 + Math.abs(Math.sin(w)) * 0.04;
         hips.rotation.y = Math.sin(w) * 0.08;
-        legL.hip.rotation.x = Math.sin(w) * 0.58;
-        legR.hip.rotation.x = -Math.sin(w) * 0.58;
-        legL.knee.rotation.x = Math.max(0, -Math.cos(w)) * 0.55;
-        legR.knee.rotation.x = Math.max(0, Math.cos(w)) * 0.55;
-        armL.shoulder.rotation.x = -Math.sin(w) * 0.52;
-        armR.shoulder.rotation.x = Math.sin(w) * 0.52;
+        legL.hip.rotation.x = Math.sin(w) * 0.48;
+        legR.hip.rotation.x = -Math.sin(w) * 0.48;
+        armL.shoulder.rotation.set(-Math.sin(w) * 0.45, 0, -0.20);
+        armR.shoulder.rotation.set(Math.sin(w) * 0.45, 0, 0.20);
         armL.elbow.rotation.x = -0.25;
         armR.elbow.rotation.x = -0.25;
-        ponytail.rotation.x = 0.25 + Math.abs(Math.sin(w)) * 0.2;
+        ponytail.rotation.x = 0.22 + Math.abs(Math.sin(w)) * 0.16;
       } else if (currentAnim === 'run') {
-        const r = t * 11.2;
-        hips.position.y = 0.80 + Math.abs(Math.sin(r)) * 0.095;
-        torso.rotation.x = 0.22;
-        legL.hip.rotation.x = Math.sin(r) * 0.95;
-        legR.hip.rotation.x = -Math.sin(r) * 0.95;
-        legL.knee.rotation.x = Math.max(0.15, -Math.cos(r)) * 1.05;
-        legR.knee.rotation.x = Math.max(0.15, Math.cos(r)) * 1.05;
-        armL.shoulder.rotation.x = -Math.sin(r) * 0.95;
-        armR.shoulder.rotation.x = Math.sin(r) * 0.95;
-        armL.elbow.rotation.x = -1.15;
-        armR.elbow.rotation.x = -1.15;
-        ponytail.rotation.x = 0.65 + Math.sin(r) * 0.25;
-        mouthGroup.scale.set(1.15, 0.95, 1.0);
+        const r = t * 11.0;
+        hips.position.y = 0.79 + Math.abs(Math.sin(r)) * 0.085;
+        torso.rotation.x = 0.16;
+        legL.hip.rotation.x = Math.sin(r) * 0.78;
+        legR.hip.rotation.x = -Math.sin(r) * 0.78;
+        armL.shoulder.rotation.set(-Math.sin(r) * 0.85, 0, -0.22);
+        armR.shoulder.rotation.set(Math.sin(r) * 0.85, 0, 0.22);
+        armL.elbow.rotation.x = -1.05;
+        armR.elbow.rotation.x = -1.05;
+        ponytail.rotation.x = 0.55 + Math.sin(r) * 0.22;
+        lowerLipPivot.position.y = -0.012;
+        smileInterior.scale.set(1.25, 0.76, 0.30);
       } else if (currentAnim === 'talk') {
-        // Real-time animated 3D mouth lip-sync!
-        const sy = 0.35 + Math.abs(Math.sin(t * 14.5)) * 0.85;
-        mouthGroup.scale.set(1.0 + Math.sin(t * 9.0) * 0.14, sy, 1.0);
-        head.rotation.x = Math.sin(t * 5.0) * 0.05;
-        head.rotation.y = Math.sin(t * 2.2) * 0.1;
-        armL.shoulder.rotation.set(-0.65, 0, 0.35);
-        armR.shoulder.rotation.set(-0.75, 0, -0.35);
-        armL.elbow.rotation.set(-0.85 + Math.sin(t * 6.0) * 0.2, 0, 0);
-        armR.elbow.rotation.set(-0.95 + Math.cos(t * 6.0) * 0.2, 0, 0);
+        const open = Math.abs(Math.sin(t * 14.0)) * 0.022;
+        lowerLipPivot.position.y = -open;
+        smileInterior.scale.set(1.20, 0.34 + open * 28, 0.30);
+        head.rotation.x = Math.sin(t * 4.5) * 0.04;
+        head.rotation.y = Math.sin(t * 2.0) * 0.08;
+        armL.shoulder.rotation.set(-0.62, 0, -0.32);
+        armR.shoulder.rotation.set(-0.72, 0, 0.32);
+        armL.elbow.rotation.set(-0.82 + Math.sin(t * 5.8) * 0.16, 0, 0.20);
+        armR.elbow.rotation.set(-0.92 + Math.cos(t * 5.8) * 0.16, 0, -0.20);
       } else if (currentAnim === 'focus') {
-        armL.shoulder.rotation.set(0.1, 0, 0.72);
-        armL.elbow.rotation.set(0, 0, -1.25);
-        armR.shoulder.rotation.set(-1.05, 0, -0.25);
-        armR.elbow.rotation.set(-0.55 + Math.sin(t * 9.0) * 0.18, 0, 0);
-        head.rotation.z = -0.07;
-        eyebrows.forEach(({ mesh, side }) => { mesh.rotation.z = Math.PI / 2 + side * 0.18; });
+        armL.shoulder.rotation.set(0.05, 0, -0.78);
+        armL.elbow.rotation.set(0, 0, 1.32);
+        armR.shoulder.rotation.set(-0.98, 0, 0.36);
+        armR.elbow.rotation.set(-0.55 + Math.sin(t * 9.0) * 0.16, 0, 0);
+        head.rotation.z = -0.06;
+        eyebrows.forEach(({ mesh, side }) => { mesh.rotation.z = side * 0.20; });
       } else if (currentAnim === 'care') {
         heart3D.visible = true;
-        const beat = 1.0 + Math.sin(t * 5.0) * 0.12;
-        heart3D.scale.setScalar(beat);
-        heart3D.position.y = 0.22 + Math.sin(t * 2.5) * 0.025;
-        armL.shoulder.rotation.set(-0.85, 0.35, 0.25);
-        armR.shoulder.rotation.set(-0.85, -0.35, -0.25);
-        armL.elbow.rotation.set(-0.8, 0, 0);
-        armR.elbow.rotation.set(-0.8, 0, 0);
-        head.rotation.z = 0.09;
+        heart3D.scale.setScalar(1.0 + Math.sin(t * 5.0) * 0.12);
+        heart3D.position.y = 0.22 + Math.sin(t * 2.5) * 0.02;
+        armL.shoulder.rotation.set(-0.80, 0.35, -0.22);
+        armR.shoulder.rotation.set(-0.80, -0.35, 0.22);
+        armL.elbow.rotation.set(-0.78, 0, 0.35);
+        armR.elbow.rotation.set(-0.78, 0, -0.35);
+        head.rotation.z = 0.08;
       } else if (currentAnim === 'laugh') {
         const j = Math.abs(Math.sin(t * 6.5));
-        hips.position.y = 0.78 + j * 0.16;
-        armL.shoulder.rotation.set(-0.2, 0, 2.55);
-        armR.shoulder.rotation.set(-0.2, 0, -2.55);
-        legL.knee.rotation.x = j * 0.45;
-        legR.knee.rotation.x = j * 0.45;
-        mouthGroup.scale.set(1.25, 1.15, 1.0);
+        hips.position.y = 0.76 + j * 0.14;
+        armL.shoulder.rotation.set(-0.2, 0, -2.48);
+        armR.shoulder.rotation.set(-0.2, 0, 2.48);
+        lowerLipPivot.position.y = -0.016;
+        smileInterior.scale.set(1.28, 0.88, 0.32);
         lidAngle = -0.18;
       } else if (currentAnim === 'sleepy') {
-        lidAngle = -0.12;
-        head.rotation.x = 0.12 + Math.sin(t * 1.4) * 0.05;
-        armR.shoulder.rotation.set(-1.35, -0.2, -0.35);
-        armR.elbow.rotation.set(-1.05, 0, 0);
-        mouthGroup.scale.set(0.75, 0.85 + Math.sin(t * 1.8) * 0.25, 1.0);
+        lidAngle = -0.10;
+        head.rotation.x = 0.10 + Math.sin(t * 1.4) * 0.04;
+        armR.shoulder.rotation.set(-1.32, -0.15, 0.28);
+        armR.elbow.rotation.set(-1.02, 0, -0.25);
+        const yawn = 0.014 + Math.sin(t * 1.8) * 0.008;
+        lowerLipPivot.position.y = -yawn;
+        smileInterior.scale.set(0.74, 0.56 + yawn * 16, 0.30);
       }
 
       eyelids.forEach(l => { l.rotation.x = lidAngle; });

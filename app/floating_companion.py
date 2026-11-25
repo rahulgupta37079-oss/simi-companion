@@ -413,12 +413,17 @@ class FloatingSimiApp:
             command=lambda: self._toggle_cfg("webcam_emotion_enabled"),
         )
         menu.add_separator()
+        menu.add_command(label="Open 3D Character Studio", command=self._open_3d_studio)
         menu.add_command(label="AI Brain & Name Settings...", command=self.open_settings_dialog)
         menu.add_command(label="Quit Simi", command=self.quit)
         try:
             menu.tk_popup(event.x_root, event.y_root)
         finally:
             menu.grab_release()
+
+    def _open_3d_studio(self) -> None:
+        import webbrowser
+        webbrowser.open("https://rahulgupta37079-oss.github.io/simi-companion/3d-studio.html")
 
     def _roam_now(self, mode: str) -> None:
         tx, ty = self._pick_autonomous_spot(mode)
